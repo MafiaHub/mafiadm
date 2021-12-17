@@ -1,6 +1,4 @@
 -- TODO
-local helpers = require("helpers")
-
 local playerStats = {}
 
 -- List of persistent bans
@@ -10,7 +8,7 @@ local bannedPlayers = require("bans")
 local admins = require("admins")
 
 local function isAdmin(uid)
-    return helpers.tableHasValue(admins, uid)
+    return Helpers.tableHasValue(admins, uid)
 end
 
 local function buildPlayer(playerId)
@@ -48,12 +46,12 @@ local function banPlayer(uid)
 end
 
 local function isPlayerBanned(uid)
-    return helpers.tableHasValue(bannedPlayers, uid)
+    return Helpers.tableHasValue(bannedPlayers, uid)
 end
 
 local function reloadLists()
-    admins = helpers.tableAssign(admins, require("admins"))
-    bannedPlayers = helpers.tableAssign(bannedPlayers, require("bans"))
+    admins = Helpers.tableAssign(admins, require("admins"))
+    bannedPlayers = Helpers.tableAssign(bannedPlayers, require("bans"))
 end
 
 local function showPlayerData()

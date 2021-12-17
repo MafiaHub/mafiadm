@@ -1,6 +1,3 @@
--- Load helpers
-local helpers = require("helpers")
-
 local function teamWin(team)
 	if team == Teams.none then
 		sendClientMessageToAll("It's a draw!")

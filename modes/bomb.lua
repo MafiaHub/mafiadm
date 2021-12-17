@@ -1,6 +1,3 @@
--- Load helpers
-local helpers = require("helpers")
-
 local BEEP_A0 = 1.04865151217746
 local BEEP_A1 = 0.244017811416199
 local BEEP_A2 = 1.76379778668885
@@ -29,7 +26,7 @@ local function dropBomb(player)
 	if player.hasBomb then
 		player.timeToPickupBomb = CurTime + Settings.WAIT_TIME.PICKUP_BOMB
 
-		local pos = helpers.addRandomVectorOffset(humanGetPos(player.id), {1.0, 0, 1.0}) -- IDEA don't use random, spawn it on a circle circumerence
+		local pos = Helpers.addRandomVectorOffset(humanGetPos(player.id), {1.0, 0, 1.0}) -- IDEA don't use random, spawn it on a circle circumerence
 		pickupDetach(Game.bomb.pickupId)
 		pickupSetPos(Game.bomb.pickupId, pos)
 
@@ -92,7 +89,7 @@ local function updateBomb()
 	if Game.bomb.plantTime ~= 0 then -- I know that I'm not really using onPlayerInsidePickupRadius, because it's called only for the first player in the radius, and if there's more than one inside radius - it can break the intended logic
 		if Game.bomb.defuser then
 			local defuser = Game.bomb.defuser
-			if (defuser.holdsDefusePlantKey and helpers.distanceSquared(Game.bomb.pos, humanGetPos(Game.bomb.defuser.id)) <= Settings.DEFUSE_RANGE_SQUARED) then
+			if (defuser.holdsDefusePlantKey and Helpers.distanceSquared(Game.bomb.pos, humanGetPos(Game.bomb.defuser.id)) <= Settings.DEFUSE_RANGE_SQUARED) then
 				if CurTime >= Game.bomb.timeToDefuse then
 					humanLockControls(defuser.id, false)
 
@@ -121,7 +118,7 @@ local function updateBomb()
 
 		if not Game.bomb.defuser then
 			for _, player in pairs(Teams.ct.players) do
-				local dist = helpers.distanceSquared(Game.bomb.pos, humanGetPos(player.id))
+				local dist = Helpers.distanceSquared(Game.bomb.pos, humanGetPos(player.id))
 				if (dist <= Settings.DEFUSE_RANGE_SQUARED) then
 					if player.holdsDefusePlantKey then
 						local defusingTime = player.hasDefuseKit and Settings.WAIT_TIME.DEFUSING.KIT or Settings.WAIT_TIME.DEFUSING.NO_KIT
@@ -157,9 +154,9 @@ local function updateBomb()
 				playSoundRanged(player, Game.bomb.pos, Settings.SOUNDS.EXPLOSION)
 
 				if player.state == PlayerStates.IN_ROUND then
-					local distance = helpers.distance(humanGetPos(player.id), Game.bomb.pos)
+					local distance = Helpers.distance(humanGetPos(player.id), Game.bomb.pos)
 					if distance < Settings.BOMB.BLAST_RADIUS then
-						local damage = helpers.remapValue(distance, Settings.BOMB.BLAST_RADIUS, 0, 0, Settings.BOMB.BLAST_FORCE)
+						local damage = Helpers.remapValue(distance, Settings.BOMB.BLAST_RADIUS, 0, 0, Settings.BOMB.BLAST_FORCE)
 						local health = humanGetHealth(player.id)
 						local newHealth = health - damage
 
@@ -200,7 +197,7 @@ return {
 
     updateGameState = function(state)
         if state == GameStates.WAITING_FOR_PLAYERS then
-            local bombPlayer = helpers.randomTableElem(Teams.tt.players)
+            local bombPlayer = Helpers.randomTableElem(Teams.tt.players)
             Game.bomb.pickupId = pickupCreate(humanGetPos(bombPlayer.id), Game.bomb.model)
             Game.bomb.player = bombPlayer
             pickupAttachTo(Game.bomb.pickupId, bombPlayer.id, Game.bomb.offset)
@@ -245,7 +242,7 @@ return {
                 dropBomb(player)
             else
                 for _, cuboid in pairs(Settings.BOMBSITES) do
-                    if player.state == PlayerStates.IN_ROUND and helpers.isPointInCuboid(humanGetPos(player.id), cuboid) then
+                    if player.state == PlayerStates.IN_ROUND and Helpers.isPointInCuboid(humanGetPos(player.id), cuboid) then
                         player.isInBombsite = true
 
                         if player.holdsDefusePlantKey then
@@ -305,11 +302,11 @@ return {
     handleSpecialBuy = function (player, weapon)
         if weapon.special == "defuse" then
             if player.hasDefuseKit then
-                hudAddMessage(player.id, "Couldn't buy this weapon!", helpers.rgbToColor(255, 38, 38))
+                hudAddMessage(player.id, "Couldn't buy this weapon!", Helpers.rgbToColor(255, 38, 38))
             else
                 player.money = player.money - weapon.cost
                 player.hasDefuseKit = true
-                hudAddMessage(player.id, string.format("Bought %s for %d$, money left: %d$", weapon.name, weapon.cost, player.money), helpers.rgbToColor(34, 207, 0))
+                hudAddMessage(player.id, string.format("Bought %s for %d$, money left: %d$", weapon.name, weapon.cost, player.money), Helpers.rgbToColor(34, 207, 0))
                 return true
             end
         end
@@ -359,7 +356,7 @@ return {
 
         if player.hasDefuseKit then
             player.hasDefuseKit = false
-            local pos = helpers.addRandomVectorOffset(humanGetPos(player.id), {0.5, 0, 0.5})
+            local pos = Helpers.addRandomVectorOffset(humanGetPos(player.id), {0.5, 0, 0.5})
             local pickupId = pickupCreate(pos, Settings.DEFUSE_KIT_MODEL)
             table.insert(Game.weaponPickups, pickupId)
         end

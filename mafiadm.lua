@@ -6,11 +6,11 @@
 	How to set up:
 	1. Update server.json to load mafiadm.lua
 	2. Set mission name in server.json to "tutorial"
-	3. Update mapload.lua file to specify which settings to load from cfg folder
+	3. Update mapload.lua file to specify which settings to load from maps folder
 --]]
 
 -- Load helpers
-local helpers = require("helpers")
+Helpers = require("helpers")
 local zac = require("anticheat")
 
 ---------------ENUMS---------------
@@ -21,7 +21,7 @@ Modes = require("modes")
 Settings = require("settings")
 
 -- Replace them with per-mission settings
-Settings = helpers.tableAssign(Settings, require("mapload"))
+Settings = Helpers.tableAssign(Settings, require("mapload"))
 
 PlayerStates = {
 	SELECTING_TEAM = 1,
@@ -104,7 +104,7 @@ function InitMode(mode)
 		modeInfo = require("modes/tdm")
 	end
 
-	Game = helpers.tableAssign(Game, modeInfo)
+	Game = Helpers.tableAssign(Game, modeInfo)
 end
 
 function inTeamColor(team, text)
@@ -182,7 +182,7 @@ end
 
 function sendClientMessageToAllWithStates(text, ...)
 	for _, player in pairs(Players) do
-		if helpers.tableHasValue(arg, player.state) then
+		if Helpers.tableHasValue(arg, player.state) then
 			sendClientMessage(player.id, text)
 		end
 	end
@@ -219,7 +219,7 @@ function addPlayerMoney(player, money, msg, color)
 
 	hudAddMessage(player.id,
 		string.format("%s %d$", (msg or "Awarded money:"), tostring(money)),
-		color or helpers.rgbToColor(255, 255, 255))
+		color or Helpers.rgbToColor(255, 255, 255))
 end
 
 function teamAddPlayerMoney(team, money, text)
@@ -274,11 +274,11 @@ function spawnOrTeleportPlayer(player, optionalSpawnPos, optionalSpawnDir, optio
 		local collides = true
 		while collides do
 			collides = false
-			spawnPos = helpers.randomPointInCuboid(player.team.spawnArea)
+			spawnPos = Helpers.randomPointInCuboid(player.team.spawnArea)
 
 			for _, player2 in pairs(player.team.players) do
 				if player2.id ~= player.id and player2.state == PlayerStates.IN_ROUND then
-					if helpers.distanceSquared(spawnPos, humanGetPos(player2.id)) < Settings.SPAWN_RANGE_SQUARED then
+					if Helpers.distanceSquared(spawnPos, humanGetPos(player2.id)) < Settings.SPAWN_RANGE_SQUARED then
 						collides = true
 						break
 					end
@@ -294,7 +294,7 @@ function spawnOrTeleportPlayer(player, optionalSpawnPos, optionalSpawnDir, optio
 
 	if not player.isSpawned then
 		humanDespawn(player.id)
-		humanSetModel(player.id, optionalModel or helpers.randomTableElem(player.team.models))
+		humanSetModel(player.id, optionalModel or Helpers.randomTableElem(player.team.models))
 		humanSpawn(player.id)
 
 		if not player.isSpawned or player.state == PlayerStates.DEAD then
@@ -360,7 +360,7 @@ function sendBuyMenuMessage(player)
 	else
 		sendClientMessage(player.id, "0: Go back")
 		for _, item in ipairs(playerPage) do
-			if helpers.tableHasValue(item.canBuy, player.team.shortName) and (item.gmOnly == nil or item.gmOnly == Settings.MODE) then
+			if Helpers.tableHasValue(item.canBuy, player.team.shortName) and (item.gmOnly == nil or item.gmOnly == Settings.MODE) then
 				sendClientMessage(player.id, string.format("%d: %s - %s%d$#FFFFFF", key, item.name, item.cost > player.money and "#FF0000" or "#FFFFFF", item.cost))
 				player.buyMenuPage[key] = item
 				key = key + 1
@@ -378,7 +378,7 @@ end
 
 function playSoundRanged(player, pos, soundSetting)
 	local ppos = player.isSpawned and humanGetPos(player.id) or humanGetCameraPos(player.id)
-	local volume = helpers.remapValue(helpers.distance(ppos, pos), soundSetting.RANGE, 0, 0, 1)
+	local volume = Helpers.remapValue(Helpers.distance(ppos, pos), soundSetting.RANGE, 0, 0, 1)
 	if volume > 0.0 then
 		playSound(player.id, soundSetting.FILE, pos, soundSetting.RANGE, volume, false)
 	end
@@ -390,7 +390,7 @@ function updatePlayers()
 			local curPos = humanGetPos(player.id)
 			local curDir = humanGetDir(player.id)
 
-			if helpers.compareVectors(player.lastPos, curPos) and helpers.compareVectors(player.lastDir, curDir) then
+			if Helpers.compareVectors(player.lastPos, curPos) and Helpers.compareVectors(player.lastDir, curDir) then
 				-- player hasn't moved
 			else
 				player.timeIdleStart = CurTime
@@ -400,9 +400,9 @@ function updatePlayers()
 			player.lastDir = curDir
 
 			local playerWeaponId = inventoryGetCurrentItem(player.id).weaponId
-			if helpers.tableHasValue(Settings.HEAVY_WEAPONS, playerWeaponId) then
+			if Helpers.tableHasValue(Settings.HEAVY_WEAPONS, playerWeaponId) then
 				humanSetSpeed(player.id, Settings.HEAVY_WEAPONS_RUN_SPEED)
-			elseif helpers.tableHasValue(Settings.LIGHT_WEAPONS, playerWeaponId) then
+			elseif Helpers.tableHasValue(Settings.LIGHT_WEAPONS, playerWeaponId) then
 				humanSetSpeed(player.id, Settings.LIGHT_WEAPONS_RUN_SPEED)
 			else
 				humanSetSpeed(player.id, Settings.NORMAL_WEAPONS_RUN_SPEED)
@@ -468,7 +468,7 @@ function handleDyingOrDisconnect(playerId, inflictorId, damage, hitType, bodyPar
 	for _, item in pairs(inventory) do
 		local weaponId = item.weaponId
 		if weaponId > 1 and inventoryRemoveWeapon(playerId, weaponId) then
-			local pos = helpers.addRandomVectorOffset(humanGetPos(player.id), {1.0, 0.0, 1.0})
+			local pos = Helpers.addRandomVectorOffset(humanGetPos(player.id), {1.0, 0.0, 1.0})
 			local pickupId = weaponDropCreate(weaponId, pos, 2147483647, item.ammoLoaded, item.ammoHidden)
 			table.insert(Game.weaponPickups, pickupId)
 		end
@@ -525,7 +525,7 @@ local function updateGame()
 			addHudAnnounceMessage(player, string.format("Buy time - %.2fs", WaitTime - CurTime))
 
 			if player.state == PlayerStates.IN_ROUND then
-				if not helpers.isPointInCuboid(humanGetPos(player.id), player.team.spawnAreaCheck) then
+				if not Helpers.isPointInCuboid(humanGetPos(player.id), player.team.spawnAreaCheck) then
 					--sendClientMessage(player.id, "Don't leave the spawn area during buy time please :)")
 					spawnOrTeleportPlayer(player)
 				end
@@ -582,7 +582,7 @@ local function updateGame()
 				sendSelectTeamMessage(player)
 			end
 
-			Game = helpers.deepCopy(EmptyGame)
+			Game = Helpers.deepCopy(EmptyGame)
 			Game.state = GameStates.WAITING_FOR_PLAYERS
 		end
 	end
@@ -623,7 +623,7 @@ function cmds.moolah(player, ...)
 		if #arg > 0 then
 			local money = tonumber(arg[1])
 			if money and money > 0 then
-				addPlayerMoney(player, money, "You cheeky wanker, you got", helpers.rgbToColor(255, 0, 255))
+				addPlayerMoney(player, money, "You cheeky wanker, you got", Helpers.rgbToColor(255, 0, 255))
 			end
 		end
 	end
@@ -703,7 +703,7 @@ function onScriptStart()
 	prepareSpawnAreaCheck(Teams.tt)
 	prepareSpawnAreaCheck(Teams.ct)
 
-	EmptyGame = helpers.deepCopy(InitMode(Settings.MODE))
+	EmptyGame = Helpers.deepCopy(InitMode(Settings.MODE))
 	print("MafiaDM was initialised!\n")
 end
 
@@ -741,7 +741,7 @@ function onPlayerConnected(playerId)
 		kills = 0
 	}
 
-	player = helpers.tableAssign(player, Game.initPlayer())
+	player = Helpers.tableAssign(player, Game.initPlayer())
 	Players[playerId] = player
 	Teams.none[playerId] = player
 
@@ -866,9 +866,9 @@ function onPlayerKeyPress(playerId, isDown, key)
 								if inventoryAddWeaponDefault(player.id, weapon.weaponId) then
 									player.money = player.money - weapon.cost
 									bought = true
-									hudAddMessage(player.id, string.format("Bought %s for %d$, money left: %d$", weapon.name, weapon.cost, player.money), helpers.rgbToColor(34, 207, 0))
+									hudAddMessage(player.id, string.format("Bought %s for %d$, money left: %d$", weapon.name, weapon.cost, player.money), Helpers.rgbToColor(34, 207, 0))
 								else
-									hudAddMessage(player.id, "Couldn't buy this weapon!", helpers.rgbToColor(255, 38, 38))
+									hudAddMessage(player.id, "Couldn't buy this weapon!", Helpers.rgbToColor(255, 38, 38))
 								end
 							end
 
@@ -876,7 +876,7 @@ function onPlayerKeyPress(playerId, isDown, key)
 								sendBuyMenuMessage(player)
 							end
 						else
-							hudAddMessage(player.id, string.format("Not enough money to buy this weapon, weapon: %d$, you: %d$!", weapon.cost, player.money), helpers.rgbToColor(255, 38, 38))
+							hudAddMessage(player.id, string.format("Not enough money to buy this weapon, weapon: %d$, you: %d$!", weapon.cost, player.money), Helpers.rgbToColor(255, 38, 38))
 						end
 					end
 				end
@@ -900,14 +900,14 @@ end
 
 ---@diagnostic disable-next-line: lowercase-global
 function onPlayerChat(playerId, message)
-	if #message > 0 and helpers.stringCharAt(message, 1) == "/" then
+	if #message > 0 and Helpers.stringCharAt(message, 1) == "/" then
 		message = message:sub(2)
-		local splits = helpers.stringSplit(message)
+		local splits = Helpers.stringSplit(message)
 		local cmd = cmds[splits[1]]
 
 		if cmd then
 			local player = Players[playerId]
-			cmd(player, table.unpack(helpers.tableSlice(splits, 2)))
+			cmd(player, table.unpack(Helpers.tableSlice(splits, 2)))
 		end
 	else
 		local player = Players[playerId]
