@@ -44,7 +44,7 @@ local function validateStats()
 end
 
 local function banPlayer(uid)
-    bannedPlayers = table.insert(bannedPlayers, uid)
+    table.insert(bannedPlayers, uid)
 end
 
 local function isPlayerBanned(uid)
