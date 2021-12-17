@@ -19,8 +19,8 @@ local Settings = require("settings")
 Settings = helpers.tableAssign(Settings, require("mapload"))
 
 ---------------ENUMS---------------
-
 local VirtualKeys = require("virtual_keys")
+local Modes = require("modes")
 
 PlayerStates = {
 	SELECTING_TEAM = 1,
@@ -380,6 +380,13 @@ local function prepareBuyMenu()
 	game.buyMenuPages = pages
 end
 
+local function clearUpPickups()
+	for _, pickupId in ipairs(game.weaponPickups) do
+		pickupDestroy(pickupId)
+	end
+	game.weaponPickups = {}
+end
+
 local function sendBuyMenuMessage(player)
 	local key = 1
 
@@ -451,7 +458,6 @@ local function updateGame()
 						player.isSpawned = false
 					end
 
-
 					local items = nil
 					if player.state ~= PlayerStates.DEAD then
 						items = inventoryGetItems(player.id)
@@ -475,11 +481,13 @@ local function updateGame()
 				end
 			end
 
-			local bombPlayer = helpers.randomTableElem(teams.tt.players)
-			game.bomb.pickupId = pickupCreate(humanGetPos(bombPlayer.id), game.bomb.model)
-			game.bomb.player = bombPlayer
-			pickupAttachTo(game.bomb.pickupId, bombPlayer.id, game.bomb.offset)
-			bombPlayer.hasBomb = true
+			if Settings.MODE == Modes.BOMB then
+				local bombPlayer = helpers.randomTableElem(teams.tt.players)
+				game.bomb.pickupId = pickupCreate(humanGetPos(bombPlayer.id), game.bomb.model)
+				game.bomb.player = bombPlayer
+				pickupAttachTo(game.bomb.pickupId, bombPlayer.id, game.bomb.offset)
+				bombPlayer.hasBomb = true
+			end
 
 			game.state = GameStates.BUY_TIME
 			waitTime = Settings.WAIT_TIME.BUYING + curTime
@@ -529,7 +537,22 @@ local function updateGame()
 
 		if game.bomb.plantTime == 0 and curTime > waitTime then
 			print("win cause of game time ended")
-			teamWin(teams.ct, game.bomb.plantTime ~= 0, false)
+			
+			-- we decide on winner based on MODE
+			if Settings.MODE == Modes.BOMB then
+				teamWin(teams.ct, game.bomb.plantTime ~= 0, false)
+			elseif Settings.MODE == Modes.TDM then
+				local ttScore = teams.tt.score
+				local ctScore = teams.ct.score
+
+				if ttScore > ctScore then
+					teamWin(teams.tt, false, false)
+				elseif ctScore > ttScore then
+					teamWin(teams.ct, false, false)
+				else
+					teamWin(teams.none, false, false)
+				end
+			end
 		end
 	elseif game.state == GameStates.AFTER_ROUND then
 		if waitTime > curTime then
@@ -537,10 +560,7 @@ local function updateGame()
 				addHudAnnounceMessage(player, string.format("Next round in %.2fs!", waitTime - curTime))
 			end
 		else
-			for _, pickupId in ipairs(game.weaponPickups) do
-				pickupDestroy(pickupId)
-			end
-			game.weaponPickups = {}
+			clearUpPickups()
 
 			despawnBomb()
 
@@ -561,10 +581,7 @@ local function updateGame()
 			teams.ct.winRow = 0
 			teams.ct.wonLast = false
 
-			for _, pickupId in ipairs(game.weaponPickups) do
-				pickupDestroy(pickupId)
-			end
-			game.weaponPickups = {}
+			clearUpPickups()
 
 			for _, player in pairs(players) do
 				player.money = Settings.PLAYER_STARTING_MONEY
@@ -847,6 +864,7 @@ local function handleDyingOrDisconnect(playerId, inflictorId, damage, hitType, b
 	end
 end
 
+---------------COMMANDS---------------
 
 function cmds.pos(player, ...)
 	if player.isSpawned then
@@ -945,10 +963,10 @@ function onPlayerConnected(playerId)
 	players[playerId] = player
 	teams.none[playerId] = player
 
-	sendClientMessage(playerId, "#FFFF00 Welcome to Mafia CS:GO")
+	sendClientMessage(playerId, "#FFFF00 Welcome to MafiaDM")
 	sendSelectTeamMessage(player)
 
-    cameraInterpolate(playerId, {0, 0, 0}, {0.100013, -0.156779, -0.994986, 0.000000}, {0, 0, 0}, {-0.120058, 0.039696, -0.992767, 0.000000}, 8000)
+    cameraInterpolate(playerId, Settings.WELCOME_CAMERA.START.POS, Settings.WELCOME_CAMERA.START.ROT, Settings.WELCOME_CAMERA.STOP.POS, Settings.WELCOME_CAMERA.STOP.ROT, Settings.WELCOME_CAMERA.TIME)
 end
 
 ---@diagnostic disable-next-line: lowercase-global
