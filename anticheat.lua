@@ -21,6 +21,10 @@ local function buildPlayer(playerId)
         admin = isAdmin(uid),
         last = getTime()
     }
+
+    if playerStats[playerId].admin then
+        sendClientMessage(playerId, "Signed in as Admin!")
+    end
 end
 
 local function clearPlayer(playerId)
@@ -49,7 +53,7 @@ end
 
 local function reloadLists()
     admins = helpers.tableAssign(admins, require("admins"))
-    bannedPlayers = helpers.tableAssign(bannedPlayers, require("bannedPlayers"))
+    bannedPlayers = helpers.tableAssign(bannedPlayers, require("bans"))
 end
 
 return {
