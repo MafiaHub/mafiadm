@@ -303,6 +303,21 @@ return (function ()
             }
         end,
 
+        handleSpecialBuy = function (player, weapon)
+            if weapon.special == "defuse" then
+                if player.hasDefuseKit then
+                    hudAddMessage(player.id, "Couldn't buy this weapon!", helpers.rgbToColor(255, 38, 38))
+                else
+                    player.money = player.money - weapon.cost
+                    player.hasDefuseKit = true
+                    hudAddMessage(player.id, string.format("Bought %s for %d$, money left: %d$", weapon.name, weapon.cost, player.money), helpers.rgbToColor(34, 207, 0))
+                    return true
+                end
+            end
+
+            return false
+        end,
+
         onPlayerInsidePickupRadius = function (playerId, pickupId)
             local player = Players[playerId]
 

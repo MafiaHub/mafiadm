@@ -857,17 +857,8 @@ function onPlayerKeyPress(playerId, isDown, key)
 					if weapon then
 						if player.money >= weapon.cost then
 							local bought = false
-							if weapon.special then -- should not be here but it's not harmful in other gamemodes
-								if weapon.special == "defuse" then
-									if player.hasDefuseKit then
-										hudAddMessage(player.id, "Couldn't buy this weapon!", helpers.rgbToColor(255, 38, 38))
-									else
-										player.money = player.money - weapon.cost
-										bought = true
-										player.hasDefuseKit = true
-										hudAddMessage(player.id, string.format("Bought %s for %d$, money left: %d$", weapon.name, weapon.cost, player.money), helpers.rgbToColor(34, 207, 0))
-									end
-								end
+							if weapon.special then
+								bought = Game.handleSpecialBuy(player, weapon)
 							else
 								if inventoryAddWeaponDefault(player.id, weapon.weaponId) then
 									player.money = player.money - weapon.cost
