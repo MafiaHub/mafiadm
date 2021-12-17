@@ -949,8 +949,8 @@ function cmds.ban(player, ...)
 		if #arg > 0 then
 			local playerId = tonumber(arg[1])
 			if playerId then
-				humanKick(playerId, "You have been banned from the server.")
 				zac.banPlayer(humanGetUID(playerId))
+				humanKick(playerId, "You have been banned from the server.")
 			end
 		end
 	end
@@ -1007,6 +1007,7 @@ function onPlayerConnected(playerId)
 
 	local player = {
 		id = playerId,
+		uid = humanGetUID(playerId),
 		state = PlayerStates.SELECTING_TEAM,
 		team = teams.none,
 		money = Settings.PLAYER_STARTING_MONEY,
