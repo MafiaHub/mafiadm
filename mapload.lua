@@ -2,5 +2,5 @@
 local MAPNAME = "de_dust2"
 
 -- KEEP THE REST OF THE FILE AS IS.
-return require("cfg/" .. MAPNAME)
+return require("maps/" .. MAPNAME)
 -- END OF FILE
