@@ -91,7 +91,9 @@ CurTime = 0.0
 WaitTime = 0.0
 
 Players = {}
-local cmds = {}
+
+---@diagnostic disable-next-line: lowercase-global
+cmds = {}
 
 ---------------FUNCTIONS---------------
 ---@diagnostic disable: lowercase-global
