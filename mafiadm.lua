@@ -13,15 +13,15 @@
 local helpers = require("helpers")
 local zac = require("anticheat")
 
+---------------ENUMS---------------
+VirtualKeys = require("virtual_keys")
+Modes = require("modes")
+
 -- Load global settings first
 Settings = require("settings")
 
 -- Replace them with per-mission settings
 Settings = helpers.tableAssign(Settings, require("mapload"))
-
----------------ENUMS---------------
-VirtualKeys = require("virtual_keys")
-Modes = require("modes")
 
 PlayerStates = {
 	SELECTING_TEAM = 1,

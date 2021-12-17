@@ -270,7 +270,7 @@ local settings = {
     }
 }
 
-Settings.DEFUSE_RANGE_SQUARED = Settings.DEFUSE_RANGE ^ 2
-Settings.SPAWN_RANGE_SQUARED = Settings.SPAWN_RANGE ^ 2
+settings.DEFUSE_RANGE_SQUARED = settings.DEFUSE_RANGE ^ 2
+settings.SPAWN_RANGE_SQUARED = settings.SPAWN_RANGE ^ 2
 
 return settings

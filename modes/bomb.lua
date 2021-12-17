@@ -177,211 +177,209 @@ local function updateBomb()
 	end
 end
 
-return (function ()
-    return {
-        bomb = {
-            pos = {0.0, 0.0, 0.0},
-            offset = {0.0, 2.5, 0.0},
-            pickupId = 0,
-            player = nil,
-            timeToPlant = 0.0,
-            plantTime = 0.0,
-            timeToDefuse = 0.0,
-            timeToTick = 0.0,
-            model = Settings.BOMB.MODEL,
-            defuser = nil
-        },
+return {
+    bomb = {
+        pos = {0.0, 0.0, 0.0},
+        offset = {0.0, 2.5, 0.0},
+        pickupId = 0,
+        player = nil,
+        timeToPlant = 0.0,
+        plantTime = 0.0,
+        timeToDefuse = 0.0,
+        timeToTick = 0.0,
+        model = Settings.BOMB.MODEL,
+        defuser = nil
+    },
 
-        update = function ()
-            if Game.state == GameStates.WAITING_FOR_PLAYERS then
+    update = function ()
+        if Game.state == GameStates.WAITING_FOR_PLAYERS then
+            despawnBomb()
+        end
+        updateBomb()
+    end,
+
+    updateGameState = function(state)
+        if state == GameStates.WAITING_FOR_PLAYERS then
+            local bombPlayer = helpers.randomTableElem(Teams.tt.players)
+            Game.bomb.pickupId = pickupCreate(humanGetPos(bombPlayer.id), Game.bomb.model)
+            Game.bomb.player = bombPlayer
+            pickupAttachTo(Game.bomb.pickupId, bombPlayer.id, Game.bomb.offset)
+            bombPlayer.hasBomb = true
+        elseif state == GameStates.ROUND then
+            local playTick = false
+            if Game.bomb.plantTime ~= 0 and CurTime >= Game.bomb.timeToTick then
+                local x = (CurTime - Game.bomb.plantTime) / Settings.WAIT_TIME.BOMB;
+                local n = (BEEP_A1 * x) + (BEEP_A2 * x ^ 2);
+                local bps = BEEP_A0 * math.exp(n);
+
+                Game.bomb.timeToTick = CurTime + ((1000.0 / bps) / 1000.0);
+                playTick = true
+            end
+
+            for _, player in pairs(Players) do
+                if Game.bomb.plantTime ~= 0 then
+                    if playTick then
+                        playSoundRanged(player, Game.bomb.pos, Settings.SOUNDS.BOMB_TICK)
+                    end
+
+                    addHudAnnounceMessage(player, "Bomb is planted!")
+                else
+                    addHudAnnounceMessage(player, string.format("%.2fs", WaitTime - CurTime))
+                end
+            end
+
+            if Game.bomb.plantTime == 0 and CurTime > WaitTime then
+                print("win cause of game time ended")
+                teamWin(Teams.ct, Game.bomb.plantTime ~= 0, false)
+            end
+        elseif state == GameStates.AFTER_ROUND then
+            if WaitTime < CurTime then
                 despawnBomb()
             end
-            updateBomb()
-        end,
+        end
+    end,
 
-		updateGameState = function(state)
-			if state == GameStates.WAITING_FOR_PLAYERS then
-                local bombPlayer = helpers.randomTableElem(Teams.tt.players)
-                Game.bomb.pickupId = pickupCreate(humanGetPos(bombPlayer.id), Game.bomb.model)
-                Game.bomb.player = bombPlayer
-                pickupAttachTo(Game.bomb.pickupId, bombPlayer.id, Game.bomb.offset)
-                bombPlayer.hasBomb = true
-			elseif state == GameStates.ROUND then
-				local playTick = false
-				if Game.bomb.plantTime ~= 0 and CurTime >= Game.bomb.timeToTick then
-					local x = (CurTime - Game.bomb.plantTime) / Settings.WAIT_TIME.BOMB;
-					local n = (BEEP_A1 * x) + (BEEP_A2 * x ^ 2);
-					local bps = BEEP_A0 * math.exp(n);
+    updatePlayer = function (player)
+        if player.hasBomb then
+            if CurTime - player.timeIdleStart > Settings.WAIT_TIME.AFK_DROP_BOMB then
+                dropBomb(player)
+            else
+                for _, cuboid in pairs(Settings.BOMBSITES) do
+                    if player.state == PlayerStates.IN_ROUND and helpers.isPointInCuboid(humanGetPos(player.id), cuboid) then
+                        player.isInBombsite = true
 
-					Game.bomb.timeToTick = CurTime + ((1000.0 / bps) / 1000.0);
-					playTick = true
-				end
+                        if player.holdsDefusePlantKey then
+                            if Game.bomb.timeToPlant == 0 then
+                                Game.bomb.timeToPlant = CurTime + Settings.WAIT_TIME.PLANT_BOMB
+                                humanLockControls(player.id, true)
 
-				for _, player in pairs(Players) do
-					if Game.bomb.plantTime ~= 0 then
-						if playTick then
-							playSoundRanged(player, Game.bomb.pos, Settings.SOUNDS.BOMB_TICK)
-						end
-
-						addHudAnnounceMessage(player, "Bomb is planted!")
-					else
-						addHudAnnounceMessage(player, string.format("%.2fs", WaitTime - CurTime))
-					end
-				end
-
-				if Game.bomb.plantTime == 0 and CurTime > WaitTime then
-					print("win cause of game time ended")
-					teamWin(Teams.ct, Game.bomb.plantTime ~= 0, false)
-				end
-			elseif state == GameStates.AFTER_ROUND then
-				if WaitTime < CurTime then
-					despawnBomb()
-				end
-			end
-		end,
-
-        updatePlayer = function (player)
-            if player.hasBomb then
-                if CurTime - player.timeIdleStart > Settings.WAIT_TIME.AFK_DROP_BOMB then
-                    dropBomb(player)
-                else
-                    for _, cuboid in pairs(Settings.BOMBSITES) do
-                        if player.state == PlayerStates.IN_ROUND and helpers.isPointInCuboid(humanGetPos(player.id), cuboid) then
-                            player.isInBombsite = true
-
-                            if player.holdsDefusePlantKey then
-                                if Game.bomb.timeToPlant == 0 then
-                                    Game.bomb.timeToPlant = CurTime + Settings.WAIT_TIME.PLANT_BOMB
-                                    humanLockControls(player.id, true)
-
-                                    local planterPos = humanGetPos(player.id)
-                                    for _, player2 in pairs(Players) do
-                                        playSoundRanged(player2, planterPos, Settings.SOUNDS.START_PLANT)
-                                    end
-                                elseif CurTime > Game.bomb.timeToPlant then
-                                    pickupDetach(Game.bomb.pickupId)
-
-                                    local pos = humanGetPos(player.id)
-                                    pos[2] = pos[2] + 0.5
-                                    pickupSetPos(Game.bomb.pickupId, pos)
-                                    Game.bomb.pos = pos
-
-                                    player.hasBomb = false
-                                    Game.bomb.timeToPlant = 0
-                                    Game.bomb.plantTime = CurTime
-                                    Game.bomb.player = nil
-
-                                    WaitTime = CurTime + Settings.WAIT_TIME.BOMB
-
-                                    sendClientMessageToAll("Bomb has been planted!")
-                                    humanLockControls(player.id, false)
-                                else
-                                    addHudAnnounceMessage(player, "Planting!")
+                                local planterPos = humanGetPos(player.id)
+                                for _, player2 in pairs(Players) do
+                                    playSoundRanged(player2, planterPos, Settings.SOUNDS.START_PLANT)
                                 end
-                            else
+                            elseif CurTime > Game.bomb.timeToPlant then
+                                pickupDetach(Game.bomb.pickupId)
+
+                                local pos = humanGetPos(player.id)
+                                pos[2] = pos[2] + 0.5
+                                pickupSetPos(Game.bomb.pickupId, pos)
+                                Game.bomb.pos = pos
+
+                                player.hasBomb = false
                                 Game.bomb.timeToPlant = 0
+                                Game.bomb.plantTime = CurTime
+                                Game.bomb.player = nil
+
+                                WaitTime = CurTime + Settings.WAIT_TIME.BOMB
+
+                                sendClientMessageToAll("Bomb has been planted!")
                                 humanLockControls(player.id, false)
-                                addHudAnnounceMessage(player, "Hold ALT key to plant the bomb!")
+                            else
+                                addHudAnnounceMessage(player, "Planting!")
                             end
-
-                            break
                         else
-                            player.isInBombsite = false
+                            Game.bomb.timeToPlant = 0
+                            humanLockControls(player.id, false)
+                            addHudAnnounceMessage(player, "Hold ALT key to plant the bomb!")
                         end
-                    end
-                end
-            end
-        end,
 
-        initPlayer = function ()
-            return {
-		        timeToPickupBomb = 0,
-                hasDefuseKit = false,
-                holdsDefusePlantKey = false,
-                hasBomb = false,
-                isInBombsite = false,
-            }
-        end,
-
-        handleSpecialBuy = function (player, weapon)
-            if weapon.special == "defuse" then
-                if player.hasDefuseKit then
-                    hudAddMessage(player.id, "Couldn't buy this weapon!", helpers.rgbToColor(255, 38, 38))
-                else
-                    player.money = player.money - weapon.cost
-                    player.hasDefuseKit = true
-                    hudAddMessage(player.id, string.format("Bought %s for %d$, money left: %d$", weapon.name, weapon.cost, player.money), helpers.rgbToColor(34, 207, 0))
-                    return true
-                end
-            end
-
-            return false
-        end,
-
-        onPlayerInsidePickupRadius = function (playerId, pickupId)
-            local player = Players[playerId]
-
-            if pickupId == Game.bomb.pickupId then
-                if player.state == PlayerStates.IN_ROUND
-                    and player.team == Teams.tt
-                    and not player.hasBomb
-                    and Game.bomb.plantTime == 0
-                    and (CurTime - player.timeIdleStart < Settings.WAIT_TIME.AFK_DROP_BOMB)
-                    and CurTime > player.timeToPickupBomb then
-
-                    print(humanGetName(player.id) .. " picked up bomb")
-                    pickupAttachTo(pickupId, playerId, Game.bomb.offset)
-                    Game.bomb.player = player
-                    player.hasBomb = true
-                end
-            elseif player.state == PlayerStates.IN_ROUND and player.team == Teams.ct and not player.hasDefuseKit then
-                player.hasDefuseKit = true
-                pickupDestroy(pickupId)
-            end
-        end,
-
-        onPlayerKeyPress = function (player, isDown, key)
-            if player.state == PlayerStates.IN_ROUND then
-                if (key == VirtualKeys.Menu) then
-                    --print(string.format("player %d  team %s  key %d  isDown %s", player.id, player.team.name, key, tostring(isDown)))
-                    player.holdsDefusePlantKey = isDown
-                end
-            end
-        end,
-
-        diePlayer = function (player)
-            if Game.bomb.defuser and Game.bomb.defuser.id == player.id then
-                stopDefusing()
-            end
-
-            player.holdsDefusePlantKey = false
-
-            dropBomb(player)
-
-            if player.hasDefuseKit then
-                player.hasDefuseKit = false
-                local pos = helpers.addRandomVectorOffset(humanGetPos(player.id), {0.5, 0, 0.5})
-                local pickupId = pickupCreate(pos, Settings.DEFUSE_KIT_MODEL)
-                table.insert(Game.weaponPickups, pickupId)
-            end
-
-            if Game.state == GameStates.ROUND then
-                local deadPlayersCount = 0
-                for _, player in pairs(player.team.players) do
-                    if player.state == PlayerStates.DEAD or player.state == PlayerStates.SPECTATING then
-                        deadPlayersCount = deadPlayersCount + 1
-                    end
-                end
-
-                if deadPlayersCount == player.team.numPlayers then
-                    if player.team == Teams.tt and Game.bomb.plantTime ~= 0 then
-                        --brain farted, dunno
+                        break
                     else
-                        print("win cause of enemy team dead")
-                        teamWin(player.team == Teams.ct and Teams.tt or Teams.ct, Game.bomb.plantTime ~= 0, false)
+                        player.isInBombsite = false
                     end
                 end
             end
         end
-    }
-end)()
+    end,
+
+    initPlayer = function ()
+        return {
+            timeToPickupBomb = 0,
+            hasDefuseKit = false,
+            holdsDefusePlantKey = false,
+            hasBomb = false,
+            isInBombsite = false,
+        }
+    end,
+
+    handleSpecialBuy = function (player, weapon)
+        if weapon.special == "defuse" then
+            if player.hasDefuseKit then
+                hudAddMessage(player.id, "Couldn't buy this weapon!", helpers.rgbToColor(255, 38, 38))
+            else
+                player.money = player.money - weapon.cost
+                player.hasDefuseKit = true
+                hudAddMessage(player.id, string.format("Bought %s for %d$, money left: %d$", weapon.name, weapon.cost, player.money), helpers.rgbToColor(34, 207, 0))
+                return true
+            end
+        end
+
+        return false
+    end,
+
+    onPlayerInsidePickupRadius = function (playerId, pickupId)
+        local player = Players[playerId]
+
+        if pickupId == Game.bomb.pickupId then
+            if player.state == PlayerStates.IN_ROUND
+                and player.team == Teams.tt
+                and not player.hasBomb
+                and Game.bomb.plantTime == 0
+                and (CurTime - player.timeIdleStart < Settings.WAIT_TIME.AFK_DROP_BOMB)
+                and CurTime > player.timeToPickupBomb then
+
+                print(humanGetName(player.id) .. " picked up bomb")
+                pickupAttachTo(pickupId, playerId, Game.bomb.offset)
+                Game.bomb.player = player
+                player.hasBomb = true
+            end
+        elseif player.state == PlayerStates.IN_ROUND and player.team == Teams.ct and not player.hasDefuseKit then
+            player.hasDefuseKit = true
+            pickupDestroy(pickupId)
+        end
+    end,
+
+    onPlayerKeyPress = function (player, isDown, key)
+        if player.state == PlayerStates.IN_ROUND then
+            if (key == VirtualKeys.Menu) then
+                --print(string.format("player %d  team %s  key %d  isDown %s", player.id, player.team.name, key, tostring(isDown)))
+                player.holdsDefusePlantKey = isDown
+            end
+        end
+    end,
+
+    diePlayer = function (player)
+        if Game.bomb.defuser and Game.bomb.defuser.id == player.id then
+            stopDefusing()
+        end
+
+        player.holdsDefusePlantKey = false
+
+        dropBomb(player)
+
+        if player.hasDefuseKit then
+            player.hasDefuseKit = false
+            local pos = helpers.addRandomVectorOffset(humanGetPos(player.id), {0.5, 0, 0.5})
+            local pickupId = pickupCreate(pos, Settings.DEFUSE_KIT_MODEL)
+            table.insert(Game.weaponPickups, pickupId)
+        end
+
+        if Game.state == GameStates.ROUND then
+            local deadPlayersCount = 0
+            for _, player in pairs(player.team.players) do
+                if player.state == PlayerStates.DEAD or player.state == PlayerStates.SPECTATING then
+                    deadPlayersCount = deadPlayersCount + 1
+                end
+            end
+
+            if deadPlayersCount == player.team.numPlayers then
+                if player.team == Teams.tt and Game.bomb.plantTime ~= 0 then
+                    --brain farted, dunno
+                else
+                    print("win cause of enemy team dead")
+                    teamWin(player.team == Teams.ct and Teams.tt or Teams.ct, Game.bomb.plantTime ~= 0, false)
+                end
+            end
+        end
+    end
+}

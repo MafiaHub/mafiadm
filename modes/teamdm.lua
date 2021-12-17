@@ -48,64 +48,62 @@ local function teamWin(team)
 	end
 end
 
-return (function ()
-    return {
-        update = function ()
-        end,
+return {
+    update = function ()
+    end,
 
-        updateGameState = function (state)
-            if state == GameStates.ROUND then
-                if CurTime > WaitTime then
-                    print("win cause of game time ended")
-                    local ttScore = teamCountAlivePlayers(Teams.tt)
-                    local ctScore = teamCountAlivePlayers(Teams.ct)
+    updateGameState = function (state)
+        if state == GameStates.ROUND then
+            if CurTime > WaitTime then
+                print("win cause of game time ended")
+                local ttScore = teamCountAlivePlayers(Teams.tt)
+                local ctScore = teamCountAlivePlayers(Teams.ct)
 
-                    if ttScore > ctScore then
-                        teamWin(Teams.tt)
-                    elseif ctScore > ttScore then
-                        teamWin(Teams.ct)
-                    else
-                        teamWin(Teams.none)
-                    end
-                end
-            end
-        end,
-
-        updatePlayer = function (player)
-        end,
-
-        handleSpecialBuy = function (player, weapon)
-            return false
-        end,
-
-        initPlayer = function ()
-            return {}
-        end,
-
-        onPlayerInsidePickupRadius = function (playerId, pickupId)
-        end,
-
-        onPlayerKeyPress = function (player, isDown, key)
-        end,
-
-        diePlayer = function (player)
-            if Game.state == GameStates.ROUND then
-                local deadPlayersCount = 0
-                for _, player in pairs(player.team.players) do
-                    if player.state == PlayerStates.DEAD or player.state == PlayerStates.SPECTATING then
-                        deadPlayersCount = deadPlayersCount + 1
-                    end
-                end
-
-                if deadPlayersCount == player.team.numPlayers then
-                    if player.team == Teams.tt and Game.bomb.plantTime ~= 0 then
-                        --brain farted, dunno
-                    else
-                        print("win cause of enemy team dead")
-                        teamWin(player.team == Teams.ct and Teams.tt or Teams.ct)
-                    end
+                if ttScore > ctScore then
+                    teamWin(Teams.tt)
+                elseif ctScore > ttScore then
+                    teamWin(Teams.ct)
+                else
+                    teamWin(Teams.none)
                 end
             end
         end
-    }
-end)()
+    end,
+
+    updatePlayer = function (player)
+    end,
+
+    handleSpecialBuy = function (player, weapon)
+        return false
+    end,
+
+    initPlayer = function ()
+        return {}
+    end,
+
+    onPlayerInsidePickupRadius = function (playerId, pickupId)
+    end,
+
+    onPlayerKeyPress = function (player, isDown, key)
+    end,
+
+    diePlayer = function (player)
+        if Game.state == GameStates.ROUND then
+            local deadPlayersCount = 0
+            for _, player in pairs(player.team.players) do
+                if player.state == PlayerStates.DEAD or player.state == PlayerStates.SPECTATING then
+                    deadPlayersCount = deadPlayersCount + 1
+                end
+            end
+
+            if deadPlayersCount == player.team.numPlayers then
+                if player.team == Teams.tt and Game.bomb.plantTime ~= 0 then
+                    --brain farted, dunno
+                else
+                    print("win cause of enemy team dead")
+                    teamWin(player.team == Teams.ct and Teams.tt or Teams.ct)
+                end
+            end
+        end
+    end
+}
