@@ -943,6 +943,19 @@ function cmds.kickme(player)
 	humanKick(player.id, "Self-Kick!!")
 end
 
+function cmds.ban(player, ...)
+	if zac.isAdmin(player.uid) then
+		local arg = {...}
+		if #arg > 0 then
+			local playerId = tonumber(arg[1])
+			if playerId then
+				humanKick(playerId, "You have been banned from the server.")
+				zac.banPlayer(humanGetUID(playerId))
+			end
+		end
+	end
+end
+
 -- function cmds.setSpeed(player, ...)
 -- 	if player.isSpawned then
 -- 		local speed = tonumber(arg[1])
@@ -984,7 +997,7 @@ end
 ---@diagnostic disable-next-line: lowercase-global
 function onPlayerConnected(playerId)
 	if zac.isPlayerBanned(humanGetUID(playerId)) then
-		humanKick(playerId, "You are banned from this server!")
+		humanKick(playerId, "You are banned on this server!")
 		return
 	end
 
@@ -1029,6 +1042,9 @@ end
 
 ---@diagnostic disable-next-line: lowercase-global
 function onPlayerDisconnected(playerId)
+	if players[playerId] == nil then
+		return
+	end
 	sendClientMessageToAll("Player " .. players[playerId].team:inTeamColor(humanGetName(playerId)) .. " has disconnected.")
 
 	handleDyingOrDisconnect(playerId, nil, nil, nil, nil, true)

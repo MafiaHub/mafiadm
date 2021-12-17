@@ -2,12 +2,25 @@
 local helpers = require("helpers")
 
 local playerStats = {}
-local bannedPlayers = {}
+
+-- List of persistent bans
+local bannedPlayers = {119528313747144705}
+
+-- List of admins
+local admins = {
+    119528313747144705 -- zak
+}
+
+local function isAdmin(uid)
+    return helpers.tableHasValue(admins, uid)
+end
 
 local function buildPlayer(playerId)
+    local uid = humanGetUID(playerId)
     playerStats[playerId] = {
-        uid = humanGetUID(playerId),
+        uid = uid,
         pos = humanGetPos(playerId),
+        admin = isAdmin(uid),
         last = getTime()
     }
 end
@@ -42,5 +55,6 @@ return {
     setPlayerPos = setPlayerPos,
     validateStats = validateStats,
     banPlayer = banPlayer,
-    isPlayerBanned = isPlayerBanned
+    isPlayerBanned = isPlayerBanned,
+    isAdmin = isAdmin
 }
