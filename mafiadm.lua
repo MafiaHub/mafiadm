@@ -969,6 +969,12 @@ function cmds.acreload(player)
 	end
 end
 
+function cmds.whois(player)
+	if zac.isAdmin(player.uid) then
+		zac.showPlayerData()
+	end
+end
+
 function cmds.ban(player, ...)
 	if zac.isAdmin(player.uid) then
 		local arg = {...}

@@ -56,6 +56,18 @@ local function reloadLists()
     bannedPlayers = helpers.tableAssign(bannedPlayers, require("bans"))
 end
 
+local function showPlayerData()
+    for playerId, stats in pairs(playerStats) do
+        print("Name: " .. humanGetName(playerId))
+        print("ID: " .. tostring(playerId))
+        print("UserID: " .. tostring(stats.uid))
+        print("Pos: " .. stats.pos[1] .. ", " .. stats.pos[2] .. ", " .. stats.pos[3])
+        print("Admin: " .. tostring(stats.admin))
+        print("Last: " .. stats.last)
+        print("\n")
+    end
+end
+
 return {
     buildPlayer = buildPlayer,
     clearPlayer = clearPlayer,
@@ -64,5 +76,6 @@ return {
     banPlayer = banPlayer,
     isPlayerBanned = isPlayerBanned,
     isAdmin = isAdmin,
-    reloadLists = reloadLists
+    reloadLists = reloadLists,
+    showPlayerData = showPlayerData
 }
