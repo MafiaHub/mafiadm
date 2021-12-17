@@ -706,14 +706,16 @@ function cmds.banid(player, ...)
 	end
 end
 
--- function cmds.setSpeed(player, ...)
--- 	if player.isSpawned then
--- 		local speed = tonumber(arg[1])
--- 		humanSetSpeed(player.id, speed)
--- 	else
--- 		sendClientMessage(player.id, "You are not spawned :)")
--- 	end
--- end
+function cmds.setSpeed(player, ...)
+	if zac.isAdmin(player.uid) then
+		if player.isSpawned then
+			local speed = tonumber(arg[1])
+			humanSetSpeed(player.id, speed)
+		else
+			sendClientMessage(player.id, "You are not spawned :)")
+		end
+	end
+end
 
 ---------------EVENTS---------------
 
