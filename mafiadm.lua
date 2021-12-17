@@ -939,6 +939,10 @@ function cmds.dropbomb(player, ...)
 	dropBomb(player)
 end
 
+function cmds.kickme(player)
+	humanKick(player.id, "Self-Kick!!")
+end
+
 -- function cmds.setSpeed(player, ...)
 -- 	if player.isSpawned then
 -- 		local speed = tonumber(arg[1])
@@ -979,6 +983,11 @@ end
 
 ---@diagnostic disable-next-line: lowercase-global
 function onPlayerConnected(playerId)
+	if zac.isPlayerBanned(humanGetUID(playerId)) then
+		humanKick(playerId, "You are banned from this server!")
+		return
+	end
+
 	local welcomeMessage = string.format('#FF0000[GM]#FFFFFF player #00FF00**%s** #FFFFFFhas connected to the server :)', humanGetName(playerId))
 	--sendClientMessageToAllWithStates(welcomeMessage, PlayerStates.SELECTING_TEAM, PlayerStates.DEAD, PlayerStates.WAITING_FOR_ROUND, PlayerStates.SPECTATING)
 	sendClientMessageToAll(welcomeMessage)

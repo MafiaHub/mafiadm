@@ -33,6 +33,10 @@ function humanSetName(playerId, name) end
 function humanGetName(playerId) end
 
 ---@param playerId number
+---@return number uid
+function humanGetUID(playerId) end
+
+---@param playerId number
 ---@param health number
 function humanSetHealth(playerId, health) end
 
@@ -86,6 +90,10 @@ function humanGetCameraPos(playerId) end
 
 ---@param playerId number
 function humanDie(playerId) end
+
+---@param playerId number
+---@param reason string
+function humanKick(playerId, reason) end
 
 
 ---@param playerId number
