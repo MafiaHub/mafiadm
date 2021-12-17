@@ -1,4 +1,5 @@
 local Settings = {
+    MISSION = "MISE15-PRISTAV",
     TEAMS = {
         NONE = {
             NAME = "None",
@@ -8,20 +9,19 @@ local Settings = {
             NAME = "Terrorists",
             COLOR = "#FFFF80",
             MODELS = { "Enemy04K.i3d", "Enemy06+.i3d", "Enemy08+.i3d", "Enemy10K.i3d", "Enemy12K.i3d", "TommyHAT.i3d" },
-            SPAWN_AREA = { {-12.897121; 3.092595; -7.727854}, {-4.540559; 3.092595; -16.911572} }, -- this consits of two points representing opposite corners of a not-rotated cuboid in 3D space
+            SPAWN_AREA = { {-1837.071, -4.7, -750.245}, {-1834.463, -4.7, -766.136} }, -- this consits of two points representing opposite corners of a not-rotated cuboid in 3D space
             SPAWN_DIR = { 0.900399, 0.000000, 0.435065 }
         },
         CT = {
             NAME = "Counter Terrorists",
             COLOR = "#408CFF",
             MODELS = { "pol01.i3d", "pol02.i3d", "pol03.i3d", "pol11.i3d", "pol12.i3d", "pol13.i3d" },
-            SPAWN_AREA = { {15.84541; -4.300481; 81.080124}, {26.495136; -4.295822; 76.572525} }, -- this consits of two points representing opposite corners of a not-rotated cuboid in 3D space
+            SPAWN_AREA = { {-1857.230225; -4.7; -735.69043}, {-1863.850342; -4.7; -740.580566} }, -- this consits of two points representing opposite corners of a not-rotated cuboid in 3D space
             SPAWN_DIR = { 0.900399, 0.000000, 0.435065 }
         }
     },
     BOMBSITES = {
-        { {48.551144; 0.0; 75.342354}, {41.617443; 5.0; 81.552139} }, -- this consits of two points representing opposite corners of a not-rotated cuboid in 3D space
-        { {-33.822891; -2.0; 91.44397}, {-25.660427; 4.0; 81.516945} }, -- this consits of two points representing opposite corners of a not-rotated cuboid in 3D space
+        { {-1878.905884; -8; -763.742249}, {-1860.74353; 0; -746.660034} }, -- this consits of two points representing opposite corners of a not-rotated cuboid in 3D space
     },
     SOUNDS = {
         START_PLANT = {
@@ -53,7 +53,7 @@ local Settings = {
         BLAST_FORCE = 500,
         MODEL = "2bomb.i3d"
     },
-    MAX_TEAM_SCORE = 999,
+    MAX_TEAM_SCORE = 3, -- TODO revert to 16
     FRIENDLY_FIRE = {
         ENABLED = false, -- TODO fix in RC3 Kappa
         DAMAGE_MULTIPLIER = 0.5
@@ -72,7 +72,7 @@ local Settings = {
             NO_KIT = 10.0
         }
     },
-    MIN_PLAYER_AMOUNT_PER_TEAM = 1, -- TODO change to 5
+    MIN_PLAYER_AMOUNT_PER_TEAM = 1,
     PLAYER_STARTING_MONEY = 1000,
     PLAYER_MAX_MONEY = 16000,
     NORMAL_WEAPONS_RUN_SPEED = 1.0,

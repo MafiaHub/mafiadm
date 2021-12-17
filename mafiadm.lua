@@ -1,9 +1,15 @@
--- Mafia CS:GO written by NanobotZ
+-- MafiaDM gamemode
+-- Originally written by NanobotZ
 -- Thanks a lot to Asa for helping with sounds and models!
 
-package.path = "gm_csgo/?.lua"
+--[[
+	How to set up:
+	1. Update server.json to load mafiadm.lua
+	2. Set mission name in server.json to "tutorial"
+	3. Update mapload.lua file to specify which settings to load from cfg folder
+--]]
 
-local Settings = require("game_settings")
+local Settings = require("mapload")
 local helpers = require("helpers")
 ---------------ENUMS---------------
 
@@ -888,7 +894,7 @@ end
 
 ---@diagnostic disable-next-line: lowercase-global
 function onScriptStart()
-	changeMission("TUTORIAL")
+	changeMission(Settings.MISSION)
 	print("Script start")
 	prepareBuyMenu()
 	prepareSpawnAreaCheck(teams.tt)
