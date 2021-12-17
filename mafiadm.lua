@@ -479,6 +479,115 @@ function handleDyingOrDisconnect(playerId, inflictorId, damage, hitType, bodyPar
 	end
 end
 
+local function updateGame()
+	if Game.state == GameStates.WAITING_FOR_PLAYERS then
+		if (Teams.tt.numPlayers >= Settings.MIN_PLAYER_AMOUNT_PER_TEAM and Teams.ct.numPlayers >= Settings.MIN_PLAYER_AMOUNT_PER_TEAM) or Game.skipTeamReq then
+			Game.skipTeamReq = false
+			for _, player in pairs(Players) do
+				if player.team ~= Teams.none then
+					if player.isSpawned and player.state == PlayerStates.DEAD then
+						humanDespawn(player.id)
+						player.cancelDespawn = true
+						player.isSpawned = false
+					end
+
+					local items = nil
+					if player.state ~= PlayerStates.DEAD then
+						items = inventoryGetItems(player.id)
+					end
+
+					spawnOrTeleportPlayer(player)
+
+					if items then
+						for _, item in pairs(items) do
+							if item.weaponId > 1 then
+								inventoryRemoveWeapon(player.id, item.weaponId)
+								inventoryAddWeaponDefault(player.id, item.weaponId)
+							end
+						end
+					end
+
+					player.state = PlayerStates.IN_ROUND
+
+					player.isInMainBuyMenu = true
+					sendBuyMenuMessage(player)
+				end
+			end
+
+			Game.updateGameState(Game.state)
+			Game.state = GameStates.BUY_TIME
+			WaitTime = Settings.WAIT_TIME.BUYING + CurTime
+		end
+	elseif Game.state == GameStates.ROUND then -- mostly handled by gamemodes themselves
+		Game.updateGameState(Game.state)
+	elseif Game.state == GameStates.BUY_TIME then
+		for _, player in pairs(Players) do
+			addHudAnnounceMessage(player, string.format("Buy time - %.2fs", WaitTime - CurTime))
+
+			if player.state == PlayerStates.IN_ROUND then
+				if not helpers.isPointInCuboid(humanGetPos(player.id), player.team.spawnAreaCheck) then
+					--sendClientMessage(player.id, "Don't leave the spawn area during buy time please :)")
+					spawnOrTeleportPlayer(player)
+				end
+			end
+		end
+
+		if CurTime > WaitTime then
+			for _, player in pairs(Players) do
+				player.buyMenuPage = nil
+			end
+
+			Game.updateGameState(Game.state)
+			Game.state = GameStates.ROUND
+			WaitTime = Settings.WAIT_TIME.ROUND + CurTime
+		end
+
+	elseif Game.state == GameStates.AFTER_ROUND then
+		if WaitTime > CurTime then
+			for _, player in pairs(Players) do
+				addHudAnnounceMessage(player, string.format("Next round in %.2fs!", WaitTime - CurTime))
+			end
+		else
+			clearUpPickups()
+
+			Game.updateGameState(Game.state)
+			Game.state = GameStates.WAITING_FOR_PLAYERS
+			WaitTime = Settings.WAIT_TIME.BUYING + CurTime
+		end
+	elseif Game.state == GameStates.AFTER_GAME then
+		if WaitTime > CurTime then
+			for _, player in pairs(Players) do
+				addHudAnnounceMessage(player, string.format("%s win! Next game in %.2fs!", Teams.tt.score > Teams.ct.score and Teams.tt.name or Teams.ct.name, WaitTime - CurTime))
+			end
+		else
+			Teams.tt.score = 0
+			Teams.tt.winRow = 0
+			Teams.tt.wonLast = false
+
+			Teams.ct.score = 0
+			Teams.ct.winRow = 0
+			Teams.ct.wonLast = false
+
+			clearUpPickups()
+			Game.updateGameState(Game.state)
+
+			for _, player in pairs(Players) do
+				player.money = Settings.PLAYER_STARTING_MONEY
+				if player.isSpawned then
+					humanDespawn(player.id)
+					player.isSpawned = false
+				end
+				assignPlayerToTeam(player, Teams.none)
+				player.state = PlayerStates.SELECTING_TEAM
+				sendSelectTeamMessage(player)
+			end
+
+			Game = helpers.deepCopy(EmptyGame)
+			Game.state = GameStates.WAITING_FOR_PLAYERS
+		end
+	end
+end
+
 ---------------COMMANDS---------------
 
 function cmds.pos(player, ...)
@@ -496,7 +605,7 @@ function cmds.pos(player, ...)
 	end
 end
 
-function cmds.waitskip(player, ...)
+function cmds.tskip(player, ...)
 	if zac.isAdmin(player.uid) then
 		WaitTime = CurTime
 	end
@@ -581,6 +690,7 @@ end
 function onTick()
     CurTime = getTime() * 0.001
 
+	updateGame()
 	Game.update()
 	updatePlayers()
 	zac.validateStats()

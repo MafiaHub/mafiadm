@@ -41,15 +41,6 @@ local function dropBomb(player)
 end
 
 local function teamWin(team, bombPlanted, bombExploded)
-	if team == Teams.none then
-		sendClientMessageToAll("It's a draw!")
-		sendClientMessageToAll(string.format("%s %d : %d %s", Teams.tt:inTeamColor(), Teams.tt.score, Teams.ct.score, Teams.ct:inTeamColor()))
-		local ctPaymentInfo = Settings.ROUND_PAYMENT.ct[team.winRow > 5 and 5 or team.winRow]
-		local ttPaymentInfo = Settings.ROUND_PAYMENT.tt[team.winRow > 5 and 5 or team.winRow]
-		teamAddPlayerMoney(Teams.tt, ctPaymentInfo.loss, "You've got")
-		teamAddPlayerMoney(Teams.tt, ttPaymentInfo.loss, "You've got")
-		return
-	end
 	team.score = team.score + 1
 
 	sendClientMessageToAll(team:inTeamColor() .. " win!")
@@ -84,160 +75,6 @@ local function teamWin(team, bombPlanted, bombExploded)
 	else
 		Game.state = GameStates.AFTER_ROUND
 		WaitTime = Settings.WAIT_TIME.END_ROUND + CurTime
-	end
-end
-
-local function updateGame()
-	if Game.state == GameStates.WAITING_FOR_PLAYERS then
-		despawnBomb()
-
-		if (Teams.tt.numPlayers >= Settings.MIN_PLAYER_AMOUNT_PER_TEAM and Teams.ct.numPlayers >= Settings.MIN_PLAYER_AMOUNT_PER_TEAM) or Game.skipTeamReq then
-			Game.skipTeamReq = false
-			for _, player in pairs(Players) do
-				if player.team ~= Teams.none then
-					if player.isSpawned and player.state == PlayerStates.DEAD then
-						humanDespawn(player.id)
-						player.cancelDespawn = true
-						player.isSpawned = false
-					end
-
-					local items = nil
-					if player.state ~= PlayerStates.DEAD then
-						items = inventoryGetItems(player.id)
-					end
-
-					spawnOrTeleportPlayer(player)
-
-					if items then
-						for _, item in pairs(items) do
-							if item.weaponId > 1 then
-								inventoryRemoveWeapon(player.id, item.weaponId)
-								inventoryAddWeaponDefault(player.id, item.weaponId)
-							end
-						end
-					end
-
-					player.state = PlayerStates.IN_ROUND
-
-					player.isInMainBuyMenu = true
-					sendBuyMenuMessage(player)
-				end
-			end
-
-            local bombPlayer = helpers.randomTableElem(Teams.tt.players)
-            Game.bomb.pickupId = pickupCreate(humanGetPos(bombPlayer.id), Game.bomb.model)
-            Game.bomb.player = bombPlayer
-            pickupAttachTo(Game.bomb.pickupId, bombPlayer.id, Game.bomb.offset)
-            bombPlayer.hasBomb = true
-
-			Game.state = GameStates.BUY_TIME
-			WaitTime = Settings.WAIT_TIME.BUYING + CurTime
-		end
-	elseif Game.state == GameStates.BUY_TIME then
-		for _, player in pairs(Players) do
-			addHudAnnounceMessage(player, string.format("Buy time - %.2fs", WaitTime - CurTime))
-
-			if player.state == PlayerStates.IN_ROUND then
-				if not helpers.isPointInCuboid(humanGetPos(player.id), player.team.spawnAreaCheck) then
-					--sendClientMessage(player.id, "Don't leave the spawn area during buy time please :)")
-					spawnOrTeleportPlayer(player)
-				end
-			end
-		end
-
-		if CurTime > WaitTime then
-			for _, player in pairs(Players) do
-				player.buyMenuPage = nil
-			end
-
-			Game.state = GameStates.ROUND
-			WaitTime = Settings.WAIT_TIME.ROUND + CurTime
-		end
-	elseif Game.state == GameStates.ROUND then
-		local playTick = false
-		if Game.bomb.plantTime ~= 0 and CurTime >= Game.bomb.timeToTick then
-			local x = (CurTime - Game.bomb.plantTime) / Settings.WAIT_TIME.BOMB;
-			local n = (BEEP_A1 * x) + (BEEP_A2 * x ^ 2);
-			local bps = BEEP_A0 * math.exp(n);
-
-			Game.bomb.timeToTick = CurTime + ((1000.0 / bps) / 1000.0);
-			playTick = true
-		end
-
-		for _, player in pairs(Players) do
-			if Game.bomb.plantTime ~= 0 then
-				if playTick then
-					playSoundRanged(player, Game.bomb.pos, Settings.SOUNDS.BOMB_TICK)
-				end
-
-				addHudAnnounceMessage(player, "Bomb is planted!")
-			else
-				addHudAnnounceMessage(player, string.format("%.2fs", WaitTime - CurTime))
-			end
-		end
-
-		if Game.bomb.plantTime == 0 and CurTime > WaitTime then
-			print("win cause of game time ended")
-
-			-- we decide on winner based on MODE
-			if Settings.MODE == Modes.BOMB then
-				teamWin(Teams.ct, Game.bomb.plantTime ~= 0, false)
-			elseif Settings.MODE == Modes.TDM then
-				local ttScore = teamCountAlivePlayers(Teams.tt)
-				local ctScore = teamCountAlivePlayers(Teams.ct)
-
-				if ttScore > ctScore then
-					teamWin(Teams.tt, false, false)
-				elseif ctScore > ttScore then
-					teamWin(Teams.ct, false, false)
-				else
-					teamWin(Teams.none, false, false)
-				end
-			end
-		end
-	elseif Game.state == GameStates.AFTER_ROUND then
-		if WaitTime > CurTime then
-			for _, player in pairs(Players) do
-				addHudAnnounceMessage(player, string.format("Next round in %.2fs!", WaitTime - CurTime))
-			end
-		else
-			clearUpPickups()
-
-			despawnBomb()
-
-			Game.state = GameStates.WAITING_FOR_PLAYERS
-			WaitTime = Settings.WAIT_TIME.BUYING + CurTime
-		end
-	elseif Game.state == GameStates.AFTER_GAME then
-		if WaitTime > CurTime then
-			for _, player in pairs(Players) do
-				addHudAnnounceMessage(player, string.format("%s win! Next game in %.2fs!", Teams.tt.score > Teams.ct.score and Teams.tt.name or Teams.ct.name, WaitTime - CurTime))
-			end
-		else
-			Teams.tt.score = 0
-			Teams.tt.winRow = 0
-			Teams.tt.wonLast = false
-
-			Teams.ct.score = 0
-			Teams.ct.winRow = 0
-			Teams.ct.wonLast = false
-
-			clearUpPickups()
-
-			for _, player in pairs(Players) do
-				player.money = Settings.PLAYER_STARTING_MONEY
-				if player.isSpawned then
-					humanDespawn(player.id)
-					player.isSpawned = false
-				end
-				assignPlayerToTeam(player, Teams.none)
-				player.state = PlayerStates.SELECTING_TEAM
-				sendSelectTeamMessage(player)
-			end
-
-			Game = helpers.deepCopy(EmptyGame)
-			Game.state = GameStates.WAITING_FOR_PLAYERS
-		end
 	end
 end
 
@@ -356,9 +193,52 @@ return (function ()
         },
 
         update = function ()
-            updateGame()
+            if Game.state == GameStates.WAITING_FOR_PLAYERS then
+                despawnBomb()
+            end
             updateBomb()
         end,
+
+		updateGameState = function(state)
+			if state == GameStates.WAITING_FOR_PLAYERS then
+                local bombPlayer = helpers.randomTableElem(Teams.tt.players)
+                Game.bomb.pickupId = pickupCreate(humanGetPos(bombPlayer.id), Game.bomb.model)
+                Game.bomb.player = bombPlayer
+                pickupAttachTo(Game.bomb.pickupId, bombPlayer.id, Game.bomb.offset)
+                bombPlayer.hasBomb = true
+			elseif state == GameStates.ROUND then
+				local playTick = false
+				if Game.bomb.plantTime ~= 0 and CurTime >= Game.bomb.timeToTick then
+					local x = (CurTime - Game.bomb.plantTime) / Settings.WAIT_TIME.BOMB;
+					local n = (BEEP_A1 * x) + (BEEP_A2 * x ^ 2);
+					local bps = BEEP_A0 * math.exp(n);
+
+					Game.bomb.timeToTick = CurTime + ((1000.0 / bps) / 1000.0);
+					playTick = true
+				end
+
+				for _, player in pairs(Players) do
+					if Game.bomb.plantTime ~= 0 then
+						if playTick then
+							playSoundRanged(player, Game.bomb.pos, Settings.SOUNDS.BOMB_TICK)
+						end
+
+						addHudAnnounceMessage(player, "Bomb is planted!")
+					else
+						addHudAnnounceMessage(player, string.format("%.2fs", WaitTime - CurTime))
+					end
+				end
+
+				if Game.bomb.plantTime == 0 and CurTime > WaitTime then
+					print("win cause of game time ended")
+					teamWin(Teams.ct, Game.bomb.plantTime ~= 0, false)
+				end
+			elseif state == GameStates.AFTER_ROUND then
+				if WaitTime < CurTime then
+					despawnBomb()
+				end
+			end
+		end,
 
         updatePlayer = function (player)
             if player.hasBomb then
