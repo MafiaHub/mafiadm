@@ -754,7 +754,10 @@ function onPlayerConnected(playerId)
 	end
 
 	zac.buildPlayer(playerId)
-    cameraInterpolate(playerId, Settings.WELCOME_CAMERA.START.POS, Settings.WELCOME_CAMERA.START.ROT, Settings.WELCOME_CAMERA.STOP.POS, Settings.WELCOME_CAMERA.STOP.ROT, Settings.WELCOME_CAMERA.TIME)
+
+	if Settings.WELCOME_CAMERA then
+    	cameraInterpolate(playerId, Settings.WELCOME_CAMERA.START.POS, Settings.WELCOME_CAMERA.START.ROT, Settings.WELCOME_CAMERA.STOP.POS, Settings.WELCOME_CAMERA.STOP.ROT, Settings.WELCOME_CAMERA.TIME)
+	end
 end
 
 ---@diagnostic disable-next-line: lowercase-global
