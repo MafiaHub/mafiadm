@@ -96,7 +96,8 @@ local game = {
 		timeToTick = 0.0,
 		model = Settings.BOMB.MODEL,
 		defuser = nil
-	}
+	},
+	skipTeamReq = false,
 }
 
 -- TODO better handle disconnects
@@ -125,6 +126,10 @@ teams.tt.inTeamColor = inTeamColor
 teams.ct.inTeamColor = inTeamColor
 
 local function sendSelectTeamMessage(player)
+	if Settings.TEAMS.AUTOBALANCE == true then
+		return
+	end
+
 	sendClientMessage(player.id, "Please press a corresponding number key to select an option:")
 	sendClientMessage(player.id, "1 : Choose " .. teams.tt:inTeamColor() .. " team (" .. teams.tt.numPlayers .. " players).") -- IDEA refresh when numPlayers changes ?
 	sendClientMessage(player.id, "2 : Choose " .. teams.ct:inTeamColor() .. " team (" .. teams.ct.numPlayers .. " players).") -- IDEA refresh when numPlayers changes ?
@@ -176,7 +181,7 @@ local function spectate(player, order) -- TODO fix :)
 		if player.spectating ~= playerToSpectate then
 			sendClientMessage(player.id, "Now spectating " .. playerToSpectate.team:inTeamColor(humanGetName(playerToSpectate.id)))
 		end
-		
+
 		player.spectating = playerToSpectate
 		player.state = PlayerStates.SPECTATING
 		cameraFollow(player.id, playerToSpectate.id)
@@ -217,7 +222,22 @@ local function addPlayerMoney(player, money, msg, color)
 		color or helpers.rgbToColor(255, 255, 255))
 end
 
+local function teamAddPlayerMoney(team, money, text)
+	for _, player in pairs(team.players) do
+		addPlayerMoney(player, money, text)
+	end
+end
+
 local function teamWin(team, bombPlanted, bombExploded)
+	if team == teams.none then
+		sendClientMessageToAll("It's a draw!")
+		sendClientMessageToAll(string.format("%s %d : %d %s", teams.tt:inTeamColor(), teams.tt.score, teams.ct.score, teams.ct:inTeamColor()))
+		local ctPaymentInfo = Settings.ROUND_PAYMENT.ct[team.winRow > 5 and 5 or team.winRow]
+		local ttPaymentInfo = Settings.ROUND_PAYMENT.tt[team.winRow > 5 and 5 or team.winRow]
+		teamAddPlayerMoney(teams.tt, ctPaymentInfo.loss, "You've got")
+		teamAddPlayerMoney(teams.tt, ttPaymentInfo.loss, "You've got")
+		return
+	end
 	team.score = team.score + 1
 
 	sendClientMessageToAll(team:inTeamColor() .. " win!")
@@ -279,6 +299,10 @@ end
 
 local function assignPlayerToTeam(player, team)
 	removePlayerFromTeam(player)
+
+	if Settings.TEAMS.AUTOBALANCE == true and team == teams.none then
+		team = teams.ct.numPlayers < teams.tt.numPlayers and teams.ct or teams.tt
+	end
 
 	team.numPlayers = team.numPlayers + 1
 	team.players[player.id] = player
@@ -343,6 +367,18 @@ local function spawnOrTeleportPlayer(player, optionalSpawnPos, optionalSpawnDir,
 	elseif humanGetHealth(player.id) < 100.0 then
 		humanSetHealth(player.id, 100.0)
 	end
+end
+
+local function teamCountAlivePlayers(team)
+	local count = 0
+
+	for _, player in pairs(team.players) do
+		if player.state == PlayerStates.IN_ROUND then
+			count = count + 1
+		end
+	end
+
+	return count
 end
 
 local function despawnBomb()
@@ -416,7 +452,7 @@ local function sendBuyMenuMessage(player)
 end
 
 local function prepareSpawnAreaCheck(team)
-	team.spawnAreaCheck = { 
+	team.spawnAreaCheck = {
 		{ team.spawnArea[1][1], team.spawnArea[1][2] - 5, team.spawnArea[1][3] },
 		{ team.spawnArea[2][1], team.spawnArea[2][2] + 5, team.spawnArea[2][3] }
 	}
@@ -449,7 +485,8 @@ local function updateGame()
 	if game.state == GameStates.WAITING_FOR_PLAYERS then
 		despawnBomb()
 
-		if teams.tt.numPlayers >= Settings.MIN_PLAYER_AMOUNT_PER_TEAM and teams.ct.numPlayers >= Settings.MIN_PLAYER_AMOUNT_PER_TEAM then
+		if (teams.tt.numPlayers >= Settings.MIN_PLAYER_AMOUNT_PER_TEAM and teams.ct.numPlayers >= Settings.MIN_PLAYER_AMOUNT_PER_TEAM) or game.skipTeamReq then
+			game.skipTeamReq = false
 			for _, player in pairs(players) do
 				if player.team ~= teams.none then
 					if player.isSpawned and player.state == PlayerStates.DEAD then
@@ -537,13 +574,13 @@ local function updateGame()
 
 		if game.bomb.plantTime == 0 and curTime > waitTime then
 			print("win cause of game time ended")
-			
+
 			-- we decide on winner based on MODE
 			if Settings.MODE == Modes.BOMB then
 				teamWin(teams.ct, game.bomb.plantTime ~= 0, false)
 			elseif Settings.MODE == Modes.TDM then
-				local ttScore = teams.tt.score
-				local ctScore = teams.ct.score
+				local ttScore = teamCountAlivePlayers(teams.tt)
+				local ctScore = teamCountAlivePlayers(teams.ct)
 
 				if ttScore > ctScore then
 					teamWin(teams.tt, false, false)
@@ -589,7 +626,7 @@ local function updateGame()
 					humanDespawn(player.id)
 					player.isSpawned = false
 				end
-				assignPlayerToTeam(player, teams.none) -- IDEA auto balance teams?
+				assignPlayerToTeam(player, teams.none)
 				player.state = PlayerStates.SELECTING_TEAM
 				sendSelectTeamMessage(player)
 			end
@@ -785,9 +822,9 @@ end
 local function handleDyingOrDisconnect(playerId, inflictorId, damage, hitType, bodyPart, disconnected)
 	local player = players[playerId]
 	local inflictor = players[inflictorId]
-	
+
 	local inventory = inventoryGetItems(player.id)
-	
+
 	player.state = PlayerStates.DEAD
 
 	if inflictor and player.id ~= inflictor.id and player.team ~= inflictor.team then
@@ -879,8 +916,12 @@ function cmds.pos(player, ...)
 	end
 end
 
-function cmds.skip(player, ...)
+function cmds.liskip(player, ...)
 	waitTime = curTime
+end
+
+function cmds.ligo(player, ...)
+	game.skipTeamReq = true
 end
 
 function cmds.moolah(player, ...)
@@ -920,12 +961,12 @@ end
 ---@diagnostic disable-next-line: lowercase-global
 function onScriptStart()
 	changeMission(Settings.MISSION)
-	print("Script start")
 	prepareBuyMenu()
 	prepareSpawnAreaCheck(teams.tt)
 	prepareSpawnAreaCheck(teams.ct)
 
 	emptyGame = helpers.deepCopy(game)
+	print("MafiaDM was initialised!\n")
 end
 
 ---@diagnostic disable-next-line: lowercase-global
@@ -964,7 +1005,12 @@ function onPlayerConnected(playerId)
 	teams.none[playerId] = player
 
 	sendClientMessage(playerId, "#FFFF00 Welcome to MafiaDM")
-	sendSelectTeamMessage(player)
+
+	if Settings.TEAMS.AUTOBALANCE == true then
+		assignPlayerToTeam(player, teams.none)
+	else
+		sendSelectTeamMessage(player)
+	end
 
     cameraInterpolate(playerId, Settings.WELCOME_CAMERA.START.POS, Settings.WELCOME_CAMERA.START.ROT, Settings.WELCOME_CAMERA.STOP.POS, Settings.WELCOME_CAMERA.STOP.ROT, Settings.WELCOME_CAMERA.TIME)
 end

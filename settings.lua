@@ -6,6 +6,7 @@ local Settings = {
     MODE = Modes.BOMB,
     MISSION = "MISE15-PRISTAV",
     TEAMS = {
+        AUTOBALANCE = true,
         NONE = {
             NAME = "None",
             COLOR = "#FFFFFF"

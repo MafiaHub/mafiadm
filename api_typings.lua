@@ -3,6 +3,8 @@
 -- YOU SHOULDN'T REQUIRE THIS LUA FILE IN ANY OF YOUR SCRIPTS!
 ---@diagnostic disable: lowercase-global
 
+--@param missionName string
+function changeMission(missionName) end
 
 ---@param playerId number
 ---@param text string

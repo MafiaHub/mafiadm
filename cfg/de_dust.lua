@@ -1,6 +1,7 @@
 local Settings = {
     MISSION = "TUTORIAL",
     TEAMS = {
+        AUTOBALANCE = true,
         NONE = {
             NAME = "None",
             COLOR = "#FFFFFF"
