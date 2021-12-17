@@ -11,6 +11,7 @@
 
 -- Load helpers
 local helpers = require("helpers")
+local zac = require("anticheat")
 
 -- Load global settings first
 local Settings = require("settings")
@@ -351,7 +352,7 @@ local function spawnOrTeleportPlayer(player, optionalSpawnPos, optionalSpawnDir,
 
 	player.lastPos = optionalSpawnPos or spawnPos
 	player.lastDir = optionalSpawnDir or player.team.spawnDir
-	humanSetPos(player.id, optionalSpawnPos or spawnPos)
+	zac.setPlayerPos(player.id, optionalSpawnPos or spawnPos)
 	humanSetDir(player.id, optionalSpawnDir or player.team.spawnDir)
 
 	if not player.isSpawned then
@@ -956,6 +957,7 @@ function onTick()
 	updateGame()
 	updateBomb()
 	updatePlayers()
+	zac.validateStats()
 end
 
 ---@diagnostic disable-next-line: lowercase-global
@@ -1012,6 +1014,7 @@ function onPlayerConnected(playerId)
 		sendSelectTeamMessage(player)
 	end
 
+	zac.buildPlayer(playerId)
     cameraInterpolate(playerId, Settings.WELCOME_CAMERA.START.POS, Settings.WELCOME_CAMERA.START.ROT, Settings.WELCOME_CAMERA.STOP.POS, Settings.WELCOME_CAMERA.STOP.ROT, Settings.WELCOME_CAMERA.TIME)
 end
 
@@ -1022,6 +1025,7 @@ function onPlayerDisconnected(playerId)
 	handleDyingOrDisconnect(playerId, nil, nil, nil, nil, true)
 	onPlayerDie(playerId)
 
+	zac.clearPlayer(playerId)
 	removePlayerFromTeam(players[playerId])
 	players[playerId] = nil
 end
