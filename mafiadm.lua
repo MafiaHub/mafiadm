@@ -215,6 +215,9 @@ function findPlayerWithUID(uid)
 end
 
 function addPlayerMoney(player, money, msg, color)
+	if Settings.PLAYER_DISABLE_ECONOMY then
+		return
+	end
 	player.money = player.money + money
 
 	if player.money > Settings.PLAYER_MAX_MONEY then
@@ -443,6 +446,13 @@ function startGame()
 			})
 		end
 	end
+
+	if Settings.WEAPON_PICKUPS then
+		for _, pickup in ipairs(Settings.WEAPON_PICKUPS) do
+			local pickupId = weaponDropCreateDefault(pickup[2], pickup[1], Settings.WEAPON_PICKUP.RESPAWN_TIME)
+			table.insert(Game.weaponPickups, pickupId)
+		end
+	end
 end
 
 function handleDyingOrDisconnect(playerId, inflictorId, damage, hitType, bodyPart, disconnected)
@@ -526,14 +536,21 @@ local function updateGame()
 
 					player.state = PlayerStates.IN_ROUND
 
-					player.isInMainBuyMenu = true
-					sendBuyMenuMessage(player)
+					if not Settings.PLAYER_DISABLE_ECONOMY then
+						player.isInMainBuyMenu = true
+						sendBuyMenuMessage(player)
+					end
 				end
 			end
 
 			Game.updateGameState(Game.state)
-			Game.state = GameStates.BUY_TIME
-			WaitTime = Settings.WAIT_TIME.BUYING + CurTime
+			if Settings.PLAYER_DISABLE_ECONOMY then
+				Game.state = GameStates.ROUND
+				WaitTime = Settings.WAIT_TIME.ROUND + CurTime
+			else
+				Game.state = GameStates.BUY_TIME
+				WaitTime = Settings.WAIT_TIME.BUYING + CurTime
+			end
 		end
 	elseif Game.state == GameStates.ROUND then
 		for _, healthPickup in ipairs(Game.healthPickups) do

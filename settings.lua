@@ -38,6 +38,9 @@ local settings = {
         RESPAWN_TIME = 90.0,
         MODEL = "vodkaHP.i3d"
     },
+    WEAPON_PICKUP = {
+        RESPAWN_TIME = 5000 * 60,
+    },
     MAX_TEAM_SCORE = 999,
     FRIENDLY_FIRE = {
         ENABLED = false, -- TODO fix in RC3 Kappa
@@ -58,6 +61,7 @@ local settings = {
         }
     },
     MIN_PLAYER_AMOUNT_PER_TEAM = 5,
+    PLAYER_DISABLE_ECONOMY = false,
     PLAYER_STARTING_MONEY = 1000,
     PLAYER_MAX_MONEY = 16000,
     NORMAL_WEAPONS_RUN_SPEED = 1.0,
