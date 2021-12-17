@@ -211,6 +211,16 @@ local function getOppositeTeam(team)
 	return team == teams.ct and teams.tt or teams.ct
 end
 
+local function findPlayerWithUID(uid)
+	for _, player in pairs(players) do
+		if player.uid == uid then
+			return player.id
+		end
+	end
+
+	return nil
+end
+
 local function addPlayerMoney(player, money, msg, color)
 	player.money = player.money + money
 
@@ -943,6 +953,12 @@ function cmds.kickme(player)
 	humanKick(player.id, "Self-Kick!!")
 end
 
+function cmds.acreload(player)
+	if zac.isAdmin(player.uid) then
+		zac.reloadLists()
+	end
+end
+
 function cmds.ban(player, ...)
 	if zac.isAdmin(player.uid) then
 		local arg = {...}
@@ -951,6 +967,23 @@ function cmds.ban(player, ...)
 			if playerId then
 				zac.banPlayer(humanGetUID(playerId))
 				humanKick(playerId, "You have been banned from the server.")
+			end
+		end
+	end
+end
+
+function cmds.banid(player, ...)
+	if zac.isAdmin(player.uid) then
+		local arg = {...}
+		if #arg > 0 then
+			local uid = tonumber(arg[1])
+			if uid then
+				zac.banPlayer(uid)
+
+				local playerId = findPlayerWithUID(uid)
+				if playerId then
+					humanKick(playerId, "You have been banned from the server.")
+				end
 			end
 		end
 	end

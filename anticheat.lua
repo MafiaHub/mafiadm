@@ -47,6 +47,11 @@ local function isPlayerBanned(uid)
     return helpers.tableHasValue(bannedPlayers, uid)
 end
 
+local function reloadLists()
+    admins = helpers.tableAssign(admins, require("admins"))
+    bannedPlayers = helpers.tableAssign(bannedPlayers, require("bannedPlayers"))
+end
+
 return {
     buildPlayer = buildPlayer,
     clearPlayer = clearPlayer,
@@ -54,5 +59,6 @@ return {
     validateStats = validateStats,
     banPlayer = banPlayer,
     isPlayerBanned = isPlayerBanned,
-    isAdmin = isAdmin
+    isAdmin = isAdmin,
+    reloadLists = reloadLists
 }
