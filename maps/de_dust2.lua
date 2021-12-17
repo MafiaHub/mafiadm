@@ -1,6 +1,4 @@
-local Modes = require("modes")
-
-local Settings = {
+local settings = {
     MISSION = "DE_DUST2",
     MODE = Modes.BOMB,
     TEAMS = {
@@ -41,4 +39,4 @@ local Settings = {
     },
 }
 
-return Settings
+return settings

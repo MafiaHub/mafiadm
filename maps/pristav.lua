@@ -1,6 +1,6 @@
-local Settings = {
+local settings = {
     MISSION = "MISE15-PRISTAV",
-    MODE = 2,
+    MODE = Modes.BOMB,
     TEAMS = {
         AUTOBALANCE = true,
         NONE = {
@@ -27,4 +27,4 @@ local Settings = {
     },
 }
 
-return Settings
+return settings

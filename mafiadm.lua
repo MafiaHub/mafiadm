@@ -360,7 +360,7 @@ function sendBuyMenuMessage(player)
 	else
 		sendClientMessage(player.id, "0: Go back")
 		for _, item in ipairs(playerPage) do
-			if helpers.tableHasValue(item.canBuy, player.team.shortName) then
+			if helpers.tableHasValue(item.canBuy, player.team.shortName) and (item.gmOnly == nil or item.gmOnly == Settings.MODE) then
 				sendClientMessage(player.id, string.format("%d: %s - %s%d$#FFFFFF", key, item.name, item.cost > player.money and "#FF0000" or "#FFFFFF", item.cost))
 				player.buyMenuPage[key] = item
 				key = key + 1
