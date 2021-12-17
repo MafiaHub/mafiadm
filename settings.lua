@@ -29,17 +29,6 @@ local Settings = {
     BOMBSITES = {
         { {-1878.905884; -8; -763.742249}, {-1860.74353; 0; -746.660034} }, -- this consits of two points representing opposite corners of a not-rotated cuboid in 3D space
     },
-    WELCOME_CAMERA = {
-        START = {
-            POS = {14.831802, 14.937092, 2.560905},
-            ROT = {-0.256033, -0.270936, 0.966668, 0.000000},
-        },
-        STOP = {
-            POS = {4.185309, -2.159345, 52.666584},
-            ROT = {-0.961907, -0.041701, -0.273376, 0.000000},
-        },
-        TIME = 8000,
-    },
     SOUNDS = {
         START_PLANT = {
             FILE = "plant.wav",
