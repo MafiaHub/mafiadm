@@ -719,9 +719,8 @@ end
 
 ---@diagnostic disable-next-line: lowercase-global
 function onTick()
-    CurTime = getTime() * 0.001
-
 	if not Game.pauseGame then
+		CurTime = getTime() * 0.001
 		updateGame()
 		Game.update()
 		updatePlayers()
