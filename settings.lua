@@ -33,6 +33,11 @@ local settings = {
         BLAST_FORCE = 500,
         MODEL = "2bomb.i3d"
     },
+    HEALTH_PICKUP = {
+        HEALTH = 25,
+        RESPAWN_TIME = 90.0,
+        MODEL = "vodkaHP.i3d"
+    },
     MAX_TEAM_SCORE = 999,
     FRIENDLY_FIRE = {
         ENABLED = false, -- TODO fix in RC3 Kappa
@@ -52,7 +57,7 @@ local settings = {
             NO_KIT = 10.0
         }
     },
-    MIN_PLAYER_AMOUNT_PER_TEAM = 1, -- TODO change to 5
+    MIN_PLAYER_AMOUNT_PER_TEAM = 5,
     PLAYER_STARTING_MONEY = 1000,
     PLAYER_MAX_MONEY = 16000,
     NORMAL_WEAPONS_RUN_SPEED = 1.0,
@@ -71,7 +76,6 @@ local settings = {
         8, -- S&W model 10 M&P
         9, -- Colt 1911
     },
-
     GRENADES = {
         5, -- Molotov Cocktail
         15 -- Grenade

@@ -25,6 +25,10 @@ local settings = {
     BOMBSITES = {
         { {-1878.905884; -8; -763.742249}, {-1860.74353; 0; -746.660034} }, -- this consits of two points representing opposite corners of a not-rotated cuboid in 3D space
     },
+    HEALTH_PICKUPS = {
+        {-1856.507812, -5.309011, -762.003967},
+        {-1851.658691, -5.308902, -756.330627},
+    }
 }
 
 return settings

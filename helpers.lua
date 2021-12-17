@@ -61,6 +61,14 @@ local function randomFloat(min, max)
     return min + ( max - min ) * math.random()
 end
 
+local function min(a, b)
+    if a < b then
+        return a
+    else
+        return b
+    end
+end
+
 local function randomPointInCuboid(rect)
     local r1 = rect[1]
     local r2 = rect[2]
@@ -168,6 +176,7 @@ local helpers = {
     dump = dump,
     compareVectors = compareVectors,
     tableAssign = tableAssign,
+    min = min,
 }
 
 return helpers

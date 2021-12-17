@@ -81,8 +81,10 @@ Game = {
 	state = GameStates.WAITING_FOR_PLAYERS,
 	roundTime = 0.0,
 	weaponPickups = {},
+	healthPickups = {},
 	buyMenuPages = {},
 	skipTeamReq = false,
+	pauseGame = false,
 }
 
 EmptyGame = nil
@@ -430,6 +432,19 @@ function findWeaponInfoInSettings(weaponId)
 	return nil
 end
 
+function startGame()
+	if Settings.HEALTH_PICKUPS then
+		for _, pickupPos in ipairs(Settings.HEALTH_PICKUPS) do
+			local healthPickupId = pickupCreate(pickupPos, Settings.HEALTH_PICKUP.MODEL)
+			table.insert(Game.healthPickups, {
+				id = healthPickupId,
+				pos = pickupPos,
+				time = 0.0
+			})
+		end
+	end
+end
+
 function handleDyingOrDisconnect(playerId, inflictorId, damage, hitType, bodyPart, disconnected)
 	local player = Players[playerId]
 	local inflictor = Players[inflictorId]
@@ -520,7 +535,13 @@ local function updateGame()
 			Game.state = GameStates.BUY_TIME
 			WaitTime = Settings.WAIT_TIME.BUYING + CurTime
 		end
-	elseif Game.state == GameStates.ROUND then -- mostly handled by gamemodes themselves
+	elseif Game.state == GameStates.ROUND then
+		for _, healthPickup in ipairs(Game.healthPickups) do
+			if healthPickup.id == nil and healthPickup.time < CurTime then
+				healthPickup.id = pickupCreate(healthPickup.pos, Settings.HEALTH_PICKUP.MODEL)
+			end
+		end
+
 		Game.updateGameState(Game.state)
 	elseif Game.state == GameStates.BUY_TIME then
 		for _, player in pairs(Players) do
@@ -586,6 +607,8 @@ local function updateGame()
 
 			Game = Helpers.deepCopy(EmptyGame)
 			Game.state = GameStates.WAITING_FOR_PLAYERS
+
+			startGame()
 		end
 	end
 end
@@ -647,6 +670,12 @@ function cmds.whois(player)
 	end
 end
 
+function cmds.p(player)
+	if zac.isAdmin(player.uid) then
+		Game.pauseGame = not Game.pauseGame
+	end
+end
+
 function cmds.ban(player, ...)
 	if zac.isAdmin(player.uid) then
 		local arg = {...}
@@ -692,10 +721,12 @@ end
 function onTick()
     CurTime = getTime() * 0.001
 
-	updateGame()
-	Game.update()
-	updatePlayers()
-	zac.validateStats()
+	if not Game.pauseGame then
+		updateGame()
+		Game.update()
+		updatePlayers()
+		zac.validateStats()
+	end
 end
 
 ---@diagnostic disable-next-line: lowercase-global
@@ -706,6 +737,7 @@ function onScriptStart()
 	prepareSpawnAreaCheck(Teams.ct)
 
 	EmptyGame = Helpers.deepCopy(InitMode(Settings.MODE))
+	startGame()
 	print("MafiaDM was initialised!\n")
 end
 
@@ -823,6 +855,21 @@ end
 
 ---@diagnostic disable-next-line: lowercase-global
 function onPlayerInsidePickupRadius(playerId, pickupId)
+	for _, healthPickup in ipairs(Game.healthPickups) do
+		if healthPickup.id == pickupId then
+			local player = Players[playerId]
+
+			if humanGetHealth(playerId) < 100.0 then
+				humanSetHealth(playerId, Helpers.min(100.0, humanGetHealth(player.id) + Settings.HEALTH_PICKUP.HEALTH))
+				sendClientMessage(playerId, "#20E7E4You have used a health pickup!")
+
+				pickupDestroy(pickupId)
+				healthPickup.id = nil
+				healthPickup.time = CurTime + Settings.HEALTH_PICKUP.RESPAWN_TIME
+			end
+		end
+	end
+
 	Game.onPlayerInsidePickupRadius(playerId, pickupId)
 end
 
