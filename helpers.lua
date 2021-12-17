@@ -135,6 +135,21 @@ local function compareVectors(vec1, vec2)
     return vec1 and vec2 and vec1[1] == vec2[1] and vec1[2] == vec2[2] and vec1[3] == vec2[3]
 end
 
+local function tableAssign(...)
+    local newTable = {}
+    local arg = {...}
+
+    for k, v in pairs(arg) do
+        if type(v) == 'table' then
+            for tk, tv in pairs(v) do
+                newTable[tk] = tv
+            end
+        end
+    end
+
+    return newTable
+end
+
 local helpers = {
     distanceSquared = distanceSquared,
     distance = distance,
@@ -151,7 +166,8 @@ local helpers = {
     rgbToColor = rgbToColor,
     remapValue = remapValue,
     dump = dump,
-    compareVectors = compareVectors
+    compareVectors = compareVectors,
+    tableAssign = tableAssign,
 }
 
 return helpers

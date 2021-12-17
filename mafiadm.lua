@@ -9,8 +9,15 @@
 	3. Update mapload.lua file to specify which settings to load from cfg folder
 --]]
 
-local Settings = require("mapload")
+-- Load helpers
 local helpers = require("helpers")
+
+-- Load global settings first
+local Settings = require("settings")
+
+-- Replace them with per-mission settings
+Settings = helpers.tableAssign(Settings, require("mapload"))
+
 ---------------ENUMS---------------
 
 local VirtualKeys = require("virtual_keys")
