@@ -1,5 +1,5 @@
 -- SPECIFY WHICH MAP TO LOAD FROM CFG FOLDER
-local MAPNAME = "pristav"
+local MAPNAME = "de_dust2"
 
 -- KEEP THE REST OF THE FILE AS IS.
 return require("cfg/" .. MAPNAME)

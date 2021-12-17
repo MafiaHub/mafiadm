@@ -4,7 +4,7 @@ local Modes = require("modes")
 
 local Settings = {
     MODE = Modes.BOMB,
-    MISSION = "MISE15-PRISTAV",
+    MISSION = "de_dust2",
     TEAMS = {
         AUTOBALANCE = true,
         NONE = {
@@ -31,12 +31,12 @@ local Settings = {
     },
     WELCOME_CAMERA = {
         START = {
-            POS = {0, 0, 0},
-            ROT = {0.100013, -0.156779, -0.994986, 0.000000},
+            POS = {14.831802, 14.937092, 2.560905},
+            ROT = {-0.256033, -0.270936, 0.966668, 0.000000},
         },
         STOP = {
-            POS = {0, 0, 0},
-            ROT = {-0.120058, 0.039696, -0.992767, 0.000000},
+            POS = {4.185309, -2.159345, 52.666584},
+            ROT = {-0.961907, -0.041701, -0.273376, 0.000000},
         },
         TIME = 8000,
     },
