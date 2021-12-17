@@ -74,6 +74,10 @@ return (function ()
         updatePlayer = function (player)
         end,
 
+        handleSpecialBuy = function (player, weapon)
+            return false
+        end,
+
         initPlayer = function ()
             return {}
         end,
