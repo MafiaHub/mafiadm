@@ -145,7 +145,7 @@ return {
             local flagPos = compareTeams(player.team, Teams.tt) and Settings.FLAGS.RED or Settings.FLAGS.BLUE
 
             if Helpers.distanceSquared(humanGetPos(player.id), flagPos) < Settings.FLAG.PLACE_RADIUS then
-                sendClientMessageToAll(string.format("%s has delivered the flag!", humanGetName(player.id)))
+                sendClientMessageToAllTeam(player.team, string.format("%s has delivered the flag!", humanGetName(player.id)))
                 resetFlag(player.flag)
                 advance.simple(player.team)
             end
