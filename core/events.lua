@@ -17,6 +17,11 @@ function onScriptStart()
 	prepareSpawnAreaCheck(Teams.ct)
 
 	InitMode(Settings.MODE)
+
+    -- Set up models for non-team gamemodes
+    Settings.TEAMS.NONE.MODELS = Helpers.tableAssign(Settings.TEAMS.TT.MODELS, Settings.TEAMS.CT.MODELS)
+    Teams.none.models = Settings.TEAMS.NONE.MODELS
+
 	EmptyGame = Helpers.deepCopy(Game)
 	startGame()
 	Game.init()
@@ -82,6 +87,8 @@ function onPlayerConnected(playerId)
 		if numPlayers < Settings.MIN_PLAYER_AMOUNT_PER_TEAM*2 then
 			sendClientMessageToAll(string.format('#FF0000[GM]#FFFFFF We need %d more players to start the round!', Settings.MIN_PLAYER_AMOUNT_PER_TEAM*2 - numPlayers))
 		end
+    elseif Settings.PLAYER_HOTJOIN then
+        spawnPlayer(player)
 	end
 end
 

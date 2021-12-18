@@ -2,11 +2,13 @@
 
 local settings = {
     TEAMS = {
+        ENABLED = true,
         AUTOASSIGN = false, -- auto-assign player to team on join
         AUTOBALANCE = true, -- rebalance teams if there are more players on one team than on another
         NONE = {
             NAME = "None",
-            COLOR = "#FFFFFF"
+            COLOR = "#FFFFFF",
+            MODELS = nil, -- combined with default models from teams
         },
         TT = {
             NAME = "Gangsters",
@@ -87,9 +89,12 @@ local settings = {
     },
     MIN_PLAYER_AMOUNT_PER_TEAM = 5,
     PLAYER_DISABLE_ECONOMY = false,
+    PLAYER_DISABLE_SHOP = false,
     PLAYER_STARTING_MONEY = 1000,
     PLAYER_MAX_MONEY = 16000,
     PLAYER_RESPAWN_AFTER_DEATH = false,
+    PLAYER_USE_SPAWNPOINTS = false,
+    PLAYER_HOTJOIN = false,
     GAME_WIN_CONDITION_TIME = false,
     NORMAL_WEAPONS_RUN_SPEED = 1.0,
     HEAVY_WEAPONS_RUN_SPEED = 0.8,

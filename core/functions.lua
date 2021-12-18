@@ -207,7 +207,9 @@ end
 function assignPlayerToTeam(player, team)
 	removePlayerFromTeam(player)
 
-	if Settings.TEAMS.AUTOASSIGN == true and team == Teams.none then
+    if not Settings.TEAMS.ENABLED then
+        team = Teams.none
+	elseif Settings.TEAMS.AUTOASSIGN == true and team == Teams.none then
 		team = Teams.ct.numPlayers < Teams.tt.numPlayers and Teams.ct or Teams.tt
 	end
 
@@ -216,7 +218,10 @@ function assignPlayerToTeam(player, team)
 	player.team = team
 	player.state = PlayerStates.WAITING_FOR_ROUND
 
-	sendClientMessage(player.id, "You are assigned to team " .. team:inTeamColor() .. "!")
+    if Settings.TEAMS.ENABLED then
+	    sendClientMessage(player.id, "You are assigned to team " .. team:inTeamColor() .. "!")
+    end
+
 	spectate(player, 1)
 end
 
@@ -237,19 +242,25 @@ function spawnOrTeleportPlayer(player, optionalSpawnPos, optionalSpawnDir, optio
 	local spawnPos = { 0.0, 0.0, 0.0 }
 
 	if not optionalSpawnPos then
-		local collides = true
-		while collides do
-			collides = false
-			spawnPos = Helpers.randomPointInCuboid(player.team.spawnArea)
+        if not Settings.PLAYER_USE_SPAWNPOINTS then
+            local collides = true
+            while collides do
+                collides = false
+                spawnPos = Helpers.randomPointInCuboid(player.team.spawnArea)
 
-			for _, player2 in pairs(player.team.players) do
-				if player2.id ~= player.id and player2.state == PlayerStates.IN_ROUND then
-					if Helpers.distanceSquared(spawnPos, humanGetPos(player2.id)) < Settings.SPAWN_RANGE_SQUARED then
-						collides = true
-						break
-					end
-				end
-			end
+                for _, player2 in pairs(player.team.players) do
+                    if player2.id ~= player.id and player2.state == PlayerStates.IN_ROUND then
+                        if Helpers.distanceSquared(spawnPos, humanGetPos(player2.id)) < Settings.SPAWN_RANGE_SQUARED then
+                            collides = true
+                            break
+                        end
+                    end
+                end
+            end
+        else
+            local spawnPoint = Helpers.randomTableElem(player.team.spawnPoints)
+            spawnPos = spawnPoint[1]
+            if not optionalSpawnDir then optionalSpawnDir = spawnPoint[2] end
 		end
 	end
 
@@ -336,6 +347,13 @@ function sendBuyMenuMessage(player)
 end
 
 function prepareSpawnAreaCheck(team)
+    if not team.spawnArea then
+        team.spawnAreaCheck = {
+            { 0.0, 0.0, 0.0 },
+            { 0.0, 0.0, 0.0 }
+        }
+        return
+    end
 	team.spawnAreaCheck = {
 		{ team.spawnArea[1][1], team.spawnArea[1][2] - 5, team.spawnArea[1][3] },
 		{ team.spawnArea[2][1], team.spawnArea[2][2] + 5, team.spawnArea[2][3] }
@@ -412,6 +430,11 @@ function startGame()
 			table.insert(Game.weaponPickups, pickupId)
 		end
 	end
+
+    if not Settings.TEAMS.ENABLED then
+        Settings.FRIENDLY_FIRE.ENABLED = true
+        Settings.TEAMS.AUTOASSIGN = true
+    end
 end
 
 function handleDyingOrDisconnect(playerId, inflictorId, damage, hitType, bodyPart, disconnected)
@@ -449,7 +472,7 @@ function handleDyingOrDisconnect(playerId, inflictorId, damage, hitType, bodyPar
 		end
 	end
 
-	Game.diePlayer(player)
+	Game.diePlayer(player, inflictor, damage, hitType, bodyPart, disconnected)
 
 	if Settings.PLAYER_RESPAWN_AFTER_DEATH then
 		player.deadTime = CurTime + Settings.WAIT_TIME.AFTER_DEATH_RESPAWN
@@ -496,7 +519,7 @@ function spawnPlayer(player)
 end
 
 local function autobalancePlayers()
-	if not Settings.TEAMS.AUTOBALANCE then
+	if not Settings.TEAMS.AUTOBALANCE or not Settings.TEAMS.ENABLED then
 		return
 	end
 
@@ -540,10 +563,10 @@ function updateGame()
 			autobalancePlayers()
 
 			for _, player in pairs(Players) do
-				if player.team ~= Teams.none then
+				if player.team ~= Teams.none or not Settings.TEAMS.ENABLED then
 					spawnPlayer(player)
 
-					if not Settings.PLAYER_DISABLE_ECONOMY then
+					if not Settings.PLAYER_DISABLE_ECONOMY and not Settings.PLAYER_DISABLE_SHOP then
 						player.isInMainBuyMenu = true
 						sendBuyMenuMessage(player)
 					end
@@ -551,7 +574,7 @@ function updateGame()
 			end
 
 			if not Game.updateGameState(Game.state) then
-				if Settings.PLAYER_DISABLE_ECONOMY then
+				if Settings.PLAYER_DISABLE_ECONOMY or Settings.PLAYER_DISABLE_SHOP then
 					Game.state = GameStates.ROUND
 					WaitTime = Settings.WAIT_TIME.ROUND + CurTime
 				else

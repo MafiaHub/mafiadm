@@ -7,6 +7,7 @@ Currently hosts these gamemodes:
 - Team Deathmatch
 - Elimination
 - Capture The Flag
+- Free-For-All (no rounds, just kill everyone)
 
 ## How to use
 

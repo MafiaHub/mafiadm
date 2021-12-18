@@ -1,4 +1,4 @@
 -- SET TO DESIRED MAP NAME
-MAPNAME = "de_dust2"
+MAPNAME = "ffa_test"
 
 require("core/mafiadm")

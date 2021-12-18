@@ -41,8 +41,15 @@ Teams = {
 		name = Settings.TEAMS.NONE.NAME,
 		shortName = "none",
 		msgColor = Settings.TEAMS.NONE.COLOR,
+		models = Settings.TEAMS.NONE.MODELS,
+		score = 0,
+		wonLast = false,
+		winRow = 0,
 		players = { },
-		numPlayers = 0
+		numPlayers = 0,
+		spawnPoints = Settings.TEAMS.NONE.SPAWN_POINTS,
+		spawnArea = Settings.TEAMS.NONE.SPAWN_AREA,
+		spawnDir = Settings.TEAMS.NONE.SPAWN_DIR
 	},
 	tt = {
 		name = Settings.TEAMS.TT.NAME,
@@ -54,6 +61,7 @@ Teams = {
 		winRow = 0,
 		players = { },
 		numPlayers = 0,
+		spawnPoints = Settings.TEAMS.TT.SPAWN_POINTS,
 		spawnArea = Settings.TEAMS.TT.SPAWN_AREA,
 		spawnDir = Settings.TEAMS.TT.SPAWN_DIR
 	},
@@ -67,6 +75,7 @@ Teams = {
 		winRow = 0,
 		players = { },
 		numPlayers = 0,
+		spawnPoints = Settings.TEAMS.CT.SPAWN_POINTS,
 		spawnArea = Settings.TEAMS.CT.SPAWN_AREA,
 		spawnDir = Settings.TEAMS.CT.SPAWN_DIR
 	}
@@ -109,7 +118,7 @@ Game = {
     onPlayerKeyPress = function (player, isDown, key)
     end,
 
-    diePlayer = function (player)
+    diePlayer = function (player, inflictor, damage, hitType, bodyPart, disconnected)
     end
 }
 
