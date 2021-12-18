@@ -66,7 +66,7 @@ local settings = {
     WEAPON_PICKUP = {
         RESPAWN_TIME = 5000 * 60,
     },
-    MAX_TEAM_SCORE = 15,
+    MAX_TEAM_SCORE = 16,
     FRIENDLY_FIRE = {
         ENABLED = false, -- TODO fix in RC3 Kappa
         DAMAGE_MULTIPLIER = 0.5
