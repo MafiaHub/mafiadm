@@ -19,8 +19,10 @@ function onScriptStart()
 	InitMode(Settings.MODE)
 
     -- Set up models for non-team gamemodes
-    Settings.TEAMS.NONE.MODELS = Helpers.tableAssign(Settings.TEAMS.TT.MODELS, Settings.TEAMS.CT.MODELS)
-    Teams.none.models = Settings.TEAMS.NONE.MODELS
+    if not Settings.TEAMS.NONE.MODELS then
+        Settings.TEAMS.NONE.MODELS = Helpers.tableAssign(Settings.TEAMS.TT.MODELS, Settings.TEAMS.CT.MODELS)
+        Teams.none.models = Settings.TEAMS.NONE.MODELS
+    end
 
 	EmptyGame = Helpers.deepCopy(Game)
 	startGame()
