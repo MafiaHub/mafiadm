@@ -42,13 +42,13 @@ local function dropFlag(player)
 		local pos = Helpers.addRandomVectorOffset(humanGetPos(player.id), {1.0, 0, 1.0})
 		pickupDetach(player.flag.id)
 		pickupSetPos(player.flag.id, pos)
+        sendClientMessageToAllTeam(player.flag.team, string.format("%s dropped the flag!", humanGetName(player.id)))
 
 		player.flag.player = nil
         player.hasFlag = false
         player.flag = nil
 
 		print(humanGetName(player.id) .. " dropped the flag")
-        sendClientMessageToAll(string.format("#FF0000%s dropped the flag!", humanGetName(player.id)))
 	end
 end
 
@@ -62,7 +62,7 @@ local function pickupFlag(player, pickupId)
             and not compareTeams(player.team, flag.team)
             and CurTime > player.timeToPickupFlag then
                 print(humanGetName(player.id) .. " captured the flag!")
-                sendClientMessageToAll(string.format("#00FF00%s captured the flag!", humanGetName(player.id)))
+                sendClientMessageToAllTeam(player.team, string.format("%s captured the flag!", humanGetName(player.id)))
                 pickupAttachTo(pickupId, player.id, Game.ctf.offset)
                 flag.player = player
                 flag.isTaken = true
@@ -72,7 +72,7 @@ local function pickupFlag(player, pickupId)
             and flag.isTaken
             and compareTeams(player.team, flag.team) then
                 print(humanGetName(player.id) .. " returned the flag!")
-                sendClientMessageToAll(string.format("#0000FF%s has returned the flag!", humanGetName(player.id)))
+                sendClientMessageToAllTeam(flag.team, string.format("%s has returned the flag!", humanGetName(player.id)))
                 resetFlag(flag)
         end
     end
