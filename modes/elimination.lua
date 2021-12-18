@@ -63,8 +63,14 @@ return {
                 else
                     teamWin(Teams.none)
                 end
+            else
+                for _, player in pairs(Players) do
+                    addHudAnnounceMessage(player, string.format("%.2fs", WaitTime - CurTime))
+                end
             end
         end
+
+        return false
     end,
 
     updatePlayer = function (player)
@@ -102,5 +108,7 @@ return {
                 end
             end
         end
+
+        spectate(player, 1)
     end
 }

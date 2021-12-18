@@ -1,6 +1,6 @@
 local settings = {
     MISSION = "MISE15-PRISTAV",
-    MODE = Modes.BOMB,
+    MODE = Modes.TDM,
     TEAMS = {
         AUTOASSIGN = true,
         NONE = {
@@ -21,9 +21,6 @@ local settings = {
             SPAWN_AREA = { {-1857.230225; -4.7; -735.69043}, {-1863.850342; -4.7; -740.580566} }, -- this consits of two points representing opposite corners of a not-rotated cuboid in 3D space
             SPAWN_DIR = { 0.900399, 0.000000, 0.435065 }
         }
-    },
-    BOMBSITES = {
-        { {-1878.905884; -8; -763.742249}, {-1860.74353; 0; -746.660034} }, -- this consits of two points representing opposite corners of a not-rotated cuboid in 3D space
     },
     HEALTH_PICKUPS = {
         {-1856.507812, -5.309011, -762.003967},
@@ -49,9 +46,8 @@ local settings = {
         },
         TIME = 80000,
     },
-    WAIT_TIME = {
-        ROUND = 999.0
-    }
+    PLAYER_DISABLE_ECONOMY = true,
+    MAX_TEAM_SCORE = 50,
 }
 
 return settings

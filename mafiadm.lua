@@ -508,6 +508,32 @@ function handleDyingOrDisconnect(playerId, inflictorId, damage, hitType, bodyPar
 	end
 end
 
+function spawnPlayer(player)
+	if player.isSpawned and player.state == PlayerStates.DEAD then
+		humanDespawn(player.id)
+		player.cancelDespawn = true
+		player.isSpawned = false
+	end
+
+	local items = nil
+	if player.state ~= PlayerStates.DEAD then
+		items = inventoryGetItems(player.id)
+	end
+
+	spawnOrTeleportPlayer(player)
+
+	if items then
+		for _, item in pairs(items) do
+			if item.weaponId > 1 then
+				inventoryRemoveWeapon(player.id, item.weaponId)
+				inventoryAddWeaponDefault(player.id, item.weaponId)
+			end
+		end
+	end
+
+	player.state = PlayerStates.IN_ROUND
+end
+
 local function autobalancePlayers()
 	if not Settings.TEAMS.AUTOBALANCE then
 		return
@@ -550,29 +576,7 @@ local function updateGame()
 
 			for _, player in pairs(Players) do
 				if player.team ~= Teams.none then
-					if player.isSpawned and player.state == PlayerStates.DEAD then
-						humanDespawn(player.id)
-						player.cancelDespawn = true
-						player.isSpawned = false
-					end
-
-					local items = nil
-					if player.state ~= PlayerStates.DEAD then
-						items = inventoryGetItems(player.id)
-					end
-
-					spawnOrTeleportPlayer(player)
-
-					if items then
-						for _, item in pairs(items) do
-							if item.weaponId > 1 then
-								inventoryRemoveWeapon(player.id, item.weaponId)
-								inventoryAddWeaponDefault(player.id, item.weaponId)
-							end
-						end
-					end
-
-					player.state = PlayerStates.IN_ROUND
+					spawnPlayer(player)
 
 					if not Settings.PLAYER_DISABLE_ECONOMY then
 						player.isInMainBuyMenu = true
@@ -581,13 +585,14 @@ local function updateGame()
 				end
 			end
 
-			Game.updateGameState(Game.state)
-			if Settings.PLAYER_DISABLE_ECONOMY then
-				Game.state = GameStates.ROUND
-				WaitTime = Settings.WAIT_TIME.ROUND + CurTime
-			else
-				Game.state = GameStates.BUY_TIME
-				WaitTime = Settings.WAIT_TIME.BUYING + CurTime
+			if not Game.updateGameState(Game.state) then
+				if Settings.PLAYER_DISABLE_ECONOMY then
+					Game.state = GameStates.ROUND
+					WaitTime = Settings.WAIT_TIME.ROUND + CurTime
+				else
+					Game.state = GameStates.BUY_TIME
+					WaitTime = Settings.WAIT_TIME.BUYING + CurTime
+				end
 			end
 		else
 			for _, player in pairs(Players) do
@@ -623,9 +628,10 @@ local function updateGame()
 				player.buyMenuPage = nil
 			end
 
-			Game.updateGameState(Game.state)
-			Game.state = GameStates.ROUND
-			WaitTime = Settings.WAIT_TIME.ROUND + CurTime
+			if not Game.updateGameState(Game.state) then
+				Game.state = GameStates.ROUND
+				WaitTime = Settings.WAIT_TIME.ROUND + CurTime
+			end
 		end
 
 	elseif Game.state == GameStates.AFTER_ROUND then
@@ -636,14 +642,19 @@ local function updateGame()
 		else
 			clearUpPickups()
 
-			Game.updateGameState(Game.state)
-			Game.state = GameStates.WAITING_FOR_PLAYERS
-			WaitTime = Settings.WAIT_TIME.BUYING + CurTime
+			if not Game.updateGameState(Game.state) then
+				Game.state = GameStates.WAITING_FOR_PLAYERS
+				WaitTime = Settings.WAIT_TIME.BUYING + CurTime
+			end
 		end
 	elseif Game.state == GameStates.AFTER_GAME then
 		if WaitTime > CurTime then
 			for _, player in pairs(Players) do
-				addHudAnnounceMessage(player, string.format("%s win! Next game in %.2fs!", Teams.tt.score > Teams.ct.score and Teams.tt.name or Teams.ct.name, WaitTime - CurTime))
+				if Teams.tt.score == Teams.ct.score then
+					addHudAnnounceMessage(player, string.format("It's a draw! Next game in %.2fs!", WaitTime - CurTime))
+				else
+					addHudAnnounceMessage(player, string.format("%s win! Next game in %.2fs!", Teams.tt.score > Teams.ct.score and Teams.tt.name or Teams.ct.name, WaitTime - CurTime))
+				end
 			end
 		else
 			Teams.tt.score = 0
@@ -800,7 +811,8 @@ function onScriptStart()
 	prepareSpawnAreaCheck(Teams.tt)
 	prepareSpawnAreaCheck(Teams.ct)
 
-	EmptyGame = Helpers.deepCopy(InitMode(Settings.MODE))
+	InitMode(Settings.MODE)
+	EmptyGame = Helpers.deepCopy(Game)
 	startGame()
 	print("MafiaDM was initialised!\n")
 end
@@ -920,8 +932,6 @@ function onPlayerDie(playerId, inflictorId, damage, hitType, bodyPart)
 	else
 		humanDespawn(player.id)
 		player.isSpawned = false
-
-		spectate(player, 1)
 	end
 end
 

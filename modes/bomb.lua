@@ -234,6 +234,8 @@ return {
                 despawnBomb()
             end
         end
+
+        return false
     end,
 
     updatePlayer = function (player)
@@ -378,5 +380,7 @@ return {
                 end
             end
         end
+
+        spectate(player, 1)
     end
 }

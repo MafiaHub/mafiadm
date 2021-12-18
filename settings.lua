@@ -45,7 +45,7 @@ local settings = {
     WEAPON_PICKUP = {
         RESPAWN_TIME = 5000 * 60,
     },
-    MAX_TEAM_SCORE = 999,
+    MAX_TEAM_SCORE = 15,
     FRIENDLY_FIRE = {
         ENABLED = false, -- TODO fix in RC3 Kappa
         DAMAGE_MULTIPLIER = 0.5
@@ -58,13 +58,13 @@ local settings = {
         PICKUP_BOMB = 5.0,
         BUYING = 30.0,
         END_ROUND = 10.0,
+        AFTER_DEATH_RESPAWN = 5.0,
         END_GAME = 15.0,
         DEFUSING = {
             KIT = 5.0,
             NO_KIT = 10.0
         }
     },
-    TDM_MAX_SCORE = 25,
     MIN_PLAYER_AMOUNT_PER_TEAM = 5,
     PLAYER_DISABLE_ECONOMY = false,
     PLAYER_STARTING_MONEY = 1000,
