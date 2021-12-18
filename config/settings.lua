@@ -2,7 +2,7 @@
 
 local settings = {
     TEAMS = {
-        ENABLED = true,
+        ENABLED = true, -- do not touch unless you know what you're doing!
         AUTOASSIGN = false, -- auto-assign player to team on join
         AUTOBALANCE = true, -- rebalance teams if there are more players on one team than on another
         NONE = {

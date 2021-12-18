@@ -101,7 +101,7 @@ return {
 
     init = function ()
         -- Team deathmatch doesn't really work with economy
-        Settings.PLAYER_DISABLE_ECONOMY = true
+        Settings.PLAYER_DISABLE_SHOP = true
 
         -- Enforce respawn after death
         Settings.PLAYER_RESPAWN_AFTER_DEATH = true
