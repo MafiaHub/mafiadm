@@ -15,22 +15,6 @@ local function despawnFlag(flag)
     flag.isTaken = false
 end
 
-local function getFlagPos(flag)
-    if flag.team.name == Teams.tt.name then
-        return Settings.FLAGS.RED
-    elseif flag.team.name == Teams.ct.name then
-        return Settings.FLAGS.BLUE
-    end
-end
-
-local function getFlagModel(flag)
-    if flag.team.name == Teams.tt.name then
-        return Settings.FLAG.MODELS.RED
-    elseif flag.team.name == Teams.ct.name then
-        return Settings.FLAG.MODELS.BLUE
-    end
-end
-
 local function getFlagByID(pickupId)
     if pickupId == Game.ctf.flags.red.id then
         return Game.ctf.flags.red
@@ -44,8 +28,8 @@ local function getFlagByID(pickupId)
 end
 
 local function resetFlag(flag)
-    local flagPos = getFlagPos(flag)
-    local flagModel = getFlagModel(flag)
+    local flagPos = compareTeams(flag.team, Teams.tt) and Settings.FLAGS.RED or Settings.FLAGS.BLUE
+    local flagModel = compareTeams(flag.team, Teams.tt) and Settings.FLAG.MODELS.RED or Settings.FLAG.MODELS.BLUE
     despawnFlag(flag)
 
     flag.id = pickupCreate(flagPos, flagModel)
@@ -75,7 +59,7 @@ local function pickupFlag(player, pickupId)
         if player.state == PlayerStates.IN_ROUND
             and not player.hasFlag
             and not flag.isTaken
-            and player.team.name ~= flag.team.name
+            and not compareTeams(player.team, flag.team)
             and CurTime > player.timeToPickupFlag then
                 print(humanGetName(player.id) .. " captured the flag!")
                 sendClientMessageToAll(string.format("#00FF00%s captured the flag!", humanGetName(player.id)))
@@ -86,7 +70,7 @@ local function pickupFlag(player, pickupId)
                 player.flag = flag
         elseif player.state == PlayerStates.IN_ROUND
             and flag.isTaken
-            and player.team.name == flag.team.name then
+            and compareTeams(player.team, flag.team) then
                 print(humanGetName(player.id) .. " returned the flag!")
                 sendClientMessageToAll(string.format("#0000FF%s has returned the flag!", humanGetName(player.id)))
                 resetFlag(flag)
@@ -155,7 +139,7 @@ return {
 
     updatePlayer = function (player)
         if player.hasFlag then
-            local flagPos = player.team.name == Teams.tt.name and Settings.FLAGS.RED or Settings.FLAGS.BLUE
+            local flagPos = compareTeams(player.team, Teams.tt) and Settings.FLAGS.RED or Settings.FLAGS.BLUE
 
             if Helpers.distanceSquared(humanGetPos(player.id), flagPos) < Settings.FLAG.PLACE_RADIUS then
                 sendClientMessageToAll(string.format("%s has delivered the flag!", humanGetName(player.id)))

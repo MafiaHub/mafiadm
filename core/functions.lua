@@ -13,6 +13,10 @@ Teams.none.inTeamColor = inTeamColor
 Teams.tt.inTeamColor = inTeamColor
 Teams.ct.inTeamColor = inTeamColor
 
+function compareTeams(t1, t2)
+    return t1.shortName == t2.shortName
+end
+
 function sendSelectTeamMessage(player)
 	if Settings.TEAMS.AUTOASSIGN == true then
 		return

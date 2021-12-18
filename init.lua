@@ -1,4 +1,4 @@
 -- SET TO DESIRED MAP NAME
-MAPNAME = "ffa_test"
+MAPNAME = "ctf_test"
 
 require("core/mafiadm")
