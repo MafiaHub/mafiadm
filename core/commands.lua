@@ -1,3 +1,7 @@
+
+---@diagnostic disable-next-line: lowercase-global
+cmds = {}
+
 function cmds.pos(player, ...)
 	if zac.isAdmin(player.uid) then
 		if player.isSpawned then

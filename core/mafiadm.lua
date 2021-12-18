@@ -120,9 +120,6 @@ WaitTime = 0.0
 
 Players = {}
 
----@diagnostic disable-next-line: lowercase-global
-cmds = {}
-
 ---------------FUNCTIONS---------------
 
 require("core/functions")
