@@ -418,8 +418,6 @@ end
 
 function buyWeapon(player, weapon)
     if player and weapon then
-        print(player.money)
-        print(weapon.cost)
         if player.money >= weapon.cost then
             local bought = false
             if weapon.special then

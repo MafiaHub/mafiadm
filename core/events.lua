@@ -182,7 +182,6 @@ function onPlayerInsidePickupRadius(playerId, pickupId)
             if player.holdsBuyWeaponKey and player.timeToBuyWeaponWithKey < CurTime then
                 player.timeToBuyWeaponWithKey = CurTime + Settings.WAIT_TIME.BUY_PICKUP_WEAPON
                 player.holdsBuyWeaponKey = false
-                print(buyWeaponPickup.wepId)
                 buyWeapon(player, weapon)
             elseif player.timeToBuyWeaponWithKey < CurTime then
                 addHudAnnounceMessage(player, string.format("Cost : %d", weapon.cost))
