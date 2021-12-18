@@ -62,6 +62,7 @@ Teams.ct = setupTeam(Settings.TEAMS.CT, "ct")
 Game = {
 	state = GameStates.WAITING_FOR_PLAYERS,
 	roundTime = 0.0,
+	roundBuyShopTime = 0.0,
 	weaponPickups = {},
 	healthPickups = {},
 	buyWeaponPickups = {},

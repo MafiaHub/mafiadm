@@ -197,8 +197,6 @@ end
 function onPlayerKeyPress(playerId, isDown, key)
 	local player = Players[playerId]
 
-	--print(string.format("player %d state %d key %d isDown %s", player.id, player.state, key, tostring(isDown)))
-
 	player.timeIdleStart = CurTime
 
 	if player.state == PlayerStates.SELECTING_TEAM then
@@ -212,33 +210,20 @@ function onPlayerKeyPress(playerId, isDown, key)
 			end
 		end
 	elseif Game.state == GameStates.BUY_TIME then
-		if player.state == PlayerStates.IN_ROUND and isDown then
-			if player.isInMainBuyMenu then
-				local menu = player.buyMenuPage[key - VirtualKeys.N0]
-				if menu then
-					player.buyMenuPage = menu
-					player.isInMainBuyMenu = false
-					sendBuyMenuMessage(player)
-				end
-			else
-				if key == VirtualKeys.N0 then
-					player.isInMainBuyMenu = true
-					sendBuyMenuMessage(player)
-				else
-					local weapon = player.buyMenuPage[key - VirtualKeys.N0]
-
-                    if buyWeapon(player, weapon) then
-                        sendBuyMenuMessage(player)
-                    end
-				end
-			end
-		end
+		handleBuyMenuRequest(player, key, isDown)
     elseif Game.state == GameStates.ROUND then
         if player.state == PlayerStates.IN_ROUND then
             if (key == VirtualKeys.Menu) then
                 player.holdsBuyWeaponKey = isDown
             elseif (key == VirtualKeys.M) and isDown then
                 hudAddMessage(player.id, string.format("Money: $%d", player.money), Helpers.rgbToColor(34, 207, 0))
+			elseif (key == VirtualKeys.B) and isDown and Settings.PLAYER_ALLOW_SHOP_IN_ROUND and Game.roundBuyShopTime > CurTime then
+				if not Settings.PLAYER_DISABLE_ECONOMY then
+					player.isInMainBuyMenu = true
+					sendBuyMenuMessage(player)
+				end
+			else
+				handleBuyMenuRequest(player, key, isDown)
             end
         end
 	elseif player.state == PlayerStates.SPECTATING or player.state == PlayerStates.WAITING_FOR_ROUND then

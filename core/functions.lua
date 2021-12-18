@@ -323,6 +323,9 @@ function clearUpPickups()
 end
 
 function sendBuyMenuMessage(player)
+	if not Helpers.isPointInCuboid(humanGetPos(player.id), player.team.spawnAreaCheck) then
+		return
+	end
 	local key = 1
 
 	local playerPage = player.buyMenuPage
@@ -345,6 +348,32 @@ function sendBuyMenuMessage(player)
 				sendClientMessage(player.id, string.format("%d: %s - %s%d$#FFFFFF", key, item.name, item.cost > player.money and "#FF0000" or "#FFFFFF", item.cost))
 				player.buyMenuPage[key] = item
 				key = key + 1
+			end
+		end
+	end
+end
+
+function handleBuyMenuRequest(player, key, isDown)
+	if Helpers.isPointInCuboid(humanGetPos(player.id), player.team.spawnAreaCheck) then
+		if player.state == PlayerStates.IN_ROUND and isDown then
+			if player.isInMainBuyMenu then
+				local menu = player.buyMenuPage[key - VirtualKeys.N0]
+				if menu then
+					player.buyMenuPage = menu
+					player.isInMainBuyMenu = false
+					sendBuyMenuMessage(player)
+				end
+			elseif player.buyMenuPage then
+				if key == VirtualKeys.N0 then
+					player.isInMainBuyMenu = true
+					sendBuyMenuMessage(player)
+				else
+					local weapon = player.buyMenuPage[key - VirtualKeys.N0]
+
+					if buyWeapon(player, weapon) then
+						sendBuyMenuMessage(player)
+					end
+				end
 			end
 		end
 	end
@@ -615,6 +644,7 @@ function updateGame()
 				if Settings.PLAYER_DISABLE_ECONOMY or Settings.PLAYER_DISABLE_SHOP then
 					Game.state = GameStates.ROUND
 					WaitTime = Settings.WAIT_TIME.ROUND + CurTime
+					Game.roundBuyShopTime = CurTime + Settings.WAIT_TIME.SHOP_CLOSE
 				else
 					Game.state = GameStates.BUY_TIME
 					WaitTime = Settings.WAIT_TIME.BUYING + CurTime
@@ -649,6 +679,7 @@ function updateGame()
 			if not Game.updateGameState(Game.state) then
 				Game.state = GameStates.ROUND
 				WaitTime = Settings.WAIT_TIME.ROUND + CurTime
+				Game.roundBuyShopTime = CurTime + Settings.WAIT_TIME.SHOP_CLOSE
 			end
 		end
 	elseif Game.state == GameStates.ROUND then
@@ -666,6 +697,16 @@ function updateGame()
 					spawnPlayer(player)
 				elseif player.state == PlayerStates.DEAD then
 					addHudAnnounceMessage(player, string.format("%.2fs left until respawn", player.deadTime - CurTime))
+				end
+			end
+		end
+
+		if Game.roundBuyShopTime > CurTime then
+			for _, player in pairs(Players) do
+				if player.state == PlayerStates.IN_ROUND then
+					if Helpers.isPointInCuboid(humanGetPos(player.id), player.team.spawnAreaCheck) then
+						addHudAnnounceMessage(player, string.format("Buy zone - %.2fs", Game.roundBuyShopTime - CurTime))
+					end
 				end
 			end
 		end
