@@ -323,7 +323,7 @@ function clearUpPickups()
 end
 
 function sendBuyMenuMessage(player)
-	if not Helpers.isPointInCuboid(humanGetPos(player.id), player.team.spawnAreaCheck) then
+	if not Settings.PLAYER_USE_SPAWNPOINTS and not Helpers.isPointInCuboid(humanGetPos(player.id), player.team.spawnAreaCheck) then
 		return
 	end
 	local key = 1
@@ -344,7 +344,7 @@ function sendBuyMenuMessage(player)
 	else
 		sendClientMessage(player.id, "0: Go back")
 		for _, item in ipairs(playerPage) do
-			if Helpers.tableHasValue(item.canBuy, player.team.shortName) and (item.gmOnly == nil or item.gmOnly == Settings.MODE) then
+			if (Helpers.tableHasValue(item.canBuy, player.team.shortName) or not Settings.TEAMS.ENABLED) and (item.gmOnly == nil or item.gmOnly == Settings.MODE) then
 				sendClientMessage(player.id, string.format("%d: %s - %s%d$#FFFFFF", key, item.name, item.cost > player.money and "#FF0000" or "#FFFFFF", item.cost))
 				player.buyMenuPage[key] = item
 				key = key + 1
@@ -354,7 +354,7 @@ function sendBuyMenuMessage(player)
 end
 
 function handleBuyMenuRequest(player, key, isDown)
-	if Helpers.isPointInCuboid(humanGetPos(player.id), player.team.spawnAreaCheck) then
+	if Settings.PLAYER_USE_SPAWNPOINTS or Helpers.isPointInCuboid(humanGetPos(player.id), player.team.spawnAreaCheck) then
 		if player.state == PlayerStates.IN_ROUND and isDown then
 			if player.isInMainBuyMenu then
 				local menu = player.buyMenuPage[key - VirtualKeys.N0]
@@ -624,7 +624,9 @@ end
 
 function updateGame()
 	if Game.state == GameStates.WAITING_FOR_PLAYERS then
-		if (Teams.tt.numPlayers >= Settings.MIN_PLAYER_AMOUNT_PER_TEAM and Teams.ct.numPlayers >= Settings.MIN_PLAYER_AMOUNT_PER_TEAM) or Game.skipTeamReq then
+		if (Teams.tt.numPlayers >= Settings.MIN_PLAYER_AMOUNT_PER_TEAM and Teams.ct.numPlayers >= Settings.MIN_PLAYER_AMOUNT_PER_TEAM) 
+			or Game.skipTeamReq
+			or Settings.PLAYER_HOTJOIN then
 			Game.skipTeamReq = false
 
 			autobalancePlayers()
@@ -701,7 +703,7 @@ function updateGame()
 			end
 		end
 
-		if Game.roundBuyShopTime > CurTime then
+		if (Game.roundBuyShopTime > CurTime or Settings.PLAYER_SHOP_IN_ROUND_NOLIMIT) and not Settings.PLAYER_USE_SPAWNPOINTS then
 			for _, player in pairs(Players) do
 				if player.state == PlayerStates.IN_ROUND then
 					if Helpers.isPointInCuboid(humanGetPos(player.id), player.team.spawnAreaCheck) then

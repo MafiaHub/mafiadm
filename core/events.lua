@@ -184,7 +184,7 @@ function onPlayerInsidePickupRadius(playerId, pickupId)
                 player.holdsBuyWeaponKey = false
                 buyWeapon(player, weapon)
             elseif player.timeToBuyWeaponWithKey < CurTime then
-                addHudAnnounceMessage(player, string.format("Cost : %d", weapon.cost))
+                addHudAnnounceMessage(player, string.format("Cost : $%d", weapon.cost))
                 addHudAnnounceMessage(player, "Press ALT key to purchase the weapon!")
             end
 		end
@@ -217,7 +217,7 @@ function onPlayerKeyPress(playerId, isDown, key)
                 player.holdsBuyWeaponKey = isDown
             elseif (key == VirtualKeys.M) and isDown then
                 hudAddMessage(player.id, string.format("Money: $%d", player.money), Helpers.rgbToColor(34, 207, 0))
-			elseif (key == VirtualKeys.B) and isDown and Settings.PLAYER_ALLOW_SHOP_IN_ROUND and Game.roundBuyShopTime > CurTime then
+			elseif (key == VirtualKeys.B) and isDown and Settings.PLAYER_ALLOW_SHOP_IN_ROUND and (Game.roundBuyShopTime > CurTime or Settings.PLAYER_SHOP_IN_ROUND_NOLIMIT) then
 				if not Settings.PLAYER_DISABLE_ECONOMY then
 					player.isInMainBuyMenu = true
 					sendBuyMenuMessage(player)

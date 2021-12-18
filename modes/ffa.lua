@@ -21,11 +21,9 @@ return {
 
         -- Use spawnpoints
         Settings.PLAYER_USE_SPAWNPOINTS = true
-    end,
 
-    update = function ()
-        -- Ensure we always skip the wait for players state
-        Game.skipTeamReq = true
+        -- Allow shops without time limit
+        Settings.PLAYER_SHOP_IN_ROUND_NOLIMIT = true
     end,
 
     initPlayer = function ()
