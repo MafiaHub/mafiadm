@@ -93,9 +93,9 @@ end
 function sendClientMessageToAllTeam(team, message)
     for _, player in pairs(Players) do
         if compareTeams(player.team, team) then
-            sendClientMessage(player, string.format("#00FF00%s", message))
+            sendClientMessage(player.id, string.format("#00FF00%s", message))
         else
-            sendClientMessage(player, string.format("#FF0000%s", message))
+            sendClientMessage(player.id, string.format("#FF0000%s", message))
         end
     end
 end
