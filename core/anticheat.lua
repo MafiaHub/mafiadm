@@ -50,8 +50,8 @@ local function isPlayerBanned(uid)
 end
 
 local function reloadLists()
-    admins = Helpers.tableAssign(admins, require("admins"))
-    bannedPlayers = Helpers.tableAssign(bannedPlayers, require("bans"))
+    admins = Helpers.tableAssign(admins, require("config/admins"))
+    bannedPlayers = Helpers.tableAssign(bannedPlayers, require("config/bans"))
 end
 
 local function showPlayerData()

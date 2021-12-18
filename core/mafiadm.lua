@@ -1,5 +1,5 @@
 -- MafiaDM gamemode
--- Originally written by NanobotZ
+-- Based on Mafia CS:GO gamemode originally written by NanobotZ
 -- Thanks a lot to Asa for helping with sounds and models!
 
 -- Load helpers
