@@ -47,7 +47,6 @@ return {
     diePlayer = function (player, inflictor)
         if Game.state == GameStates.ROUND then
             inflictor.score = inflictor.score + 1
-            addPlayerMoney(inflictor, Settings.PLAYER_MONEY_ON_KILL, "You've got", inflictor.team:inTeamColor())
         end
     end
 }
