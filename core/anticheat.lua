@@ -2,10 +2,10 @@
 local playerStats = {}
 
 -- List of persistent bans
-local bannedPlayers = require("bans")
+local bannedPlayers = require("config/bans")
 
 -- List of admins
-local admins = require("admins")
+local admins = require("config/admins")
 
 local function isAdmin(uid)
     return Helpers.tableHasValue(admins, uid)

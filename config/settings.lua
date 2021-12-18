@@ -1,7 +1,5 @@
 -- Global settings for the GM
 
-local Modes = require("modes")
-
 local settings = {
     TEAMS = {
         AUTOASSIGN = false, -- auto-assign player to team on join

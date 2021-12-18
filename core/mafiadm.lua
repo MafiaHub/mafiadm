@@ -2,26 +2,19 @@
 -- Originally written by NanobotZ
 -- Thanks a lot to Asa for helping with sounds and models!
 
---[[
-	How to set up:
-	1. Update server.json to load mafiadm.lua
-	2. Set mission name in server.json to "tutorial"
-	3. Update mapload.lua file to specify which settings to load from maps folder
---]]
-
 -- Load helpers
-Helpers = require("helpers")
-local zac = require("anticheat")
+Helpers = require("utils/helpers")
+local zac = require("core/anticheat")
 
 ---------------ENUMS---------------
-VirtualKeys = require("virtual_keys")
-Modes = require("modes")
+VirtualKeys = require("utils/virtual_keys")
+Modes = require("config/modes")
 
 -- Load global settings first
-Settings = require("settings")
+Settings = require("config/settings")
 
 -- Replace them with per-mission settings
-Settings = Helpers.tableAssignDeep(Settings, require("mapload"))
+Settings = Helpers.tableAssignDeep(Settings, require("config/mapload"))
 
 PlayerStates = {
 	SELECTING_TEAM = 1,
