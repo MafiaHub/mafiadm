@@ -13,5 +13,5 @@ Currently hosts these gamemodes:
 1. Open **server.json** and set `gamemode` to `<mod_path>/init.lua`
 2. Set `static-dir` to `<mod_path>/static`
 3. Set `map` to `TUTORIAL`
-4. Open **<mod_path>/config/mapload.lua** and set **MAPNAME** to your desired map from `<mod_path>/maps`
+4. Open **<mod_path>/init.lua** and set **MAPNAME** to your desired map from `<mod_path>/maps`
 5. Have a look at **<mod_path>/config/settings.lua** for more settings

@@ -14,7 +14,7 @@ Modes = require("config/modes")
 Settings = require("config/settings")
 
 -- Replace them with per-mission settings
-Settings = Helpers.tableAssignDeep(Settings, require("config/mapload"))
+Settings = Helpers.tableAssignDeep(Settings, require("maps/" .. MAPNAME))
 
 PlayerStates = {
 	SELECTING_TEAM = 1,
