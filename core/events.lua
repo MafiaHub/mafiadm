@@ -73,7 +73,7 @@ function onPlayerConnected(playerId)
 
 	sendClientMessage(playerId, "#FFFF00 Welcome to MafiaDM")
 
-	if Settings.TEAMS.AUTOASSIGN == true then
+	if Settings.TEAMS.AUTOASSIGN == true or not Settings.TEAMS.ENABLED then
 		assignPlayerToTeam(player, Teams.none)
 	else
 		sendSelectTeamMessage(player)
