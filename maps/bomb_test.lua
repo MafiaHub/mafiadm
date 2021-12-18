@@ -2,7 +2,7 @@ local settings = {
     MISSION = "MISE15-PRISTAV",
     MODE = Modes.BOMB,
     TEAMS = {
-        AUTOBALANCE = true,
+        AUTOASSIGN = true,
         NONE = {
             NAME = "None",
             COLOR = "#FFFFFF"
@@ -49,7 +49,9 @@ local settings = {
         },
         TIME = 80000,
     },
-    PLAYER_DISABLE_ECONOMY = true
+    WAIT_TIME = {
+        ROUND = 30.0
+    }
 }
 
 return settings

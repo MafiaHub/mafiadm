@@ -2,7 +2,6 @@ local settings = {
     MISSION = "DE_DUST2",
     MODE = Modes.BOMB,
     TEAMS = {
-        AUTOBALANCE = true,
         NONE = {
             NAME = "None",
             COLOR = "#FFFFFF"

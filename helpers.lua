@@ -143,11 +143,30 @@ local function compareVectors(vec1, vec2)
     return vec1 and vec2 and vec1[1] == vec2[1] and vec1[2] == vec2[2] and vec1[3] == vec2[3]
 end
 
+local function tableAssignDeep(...)
+    local newTable = {}
+    local arg = {...}
+
+    for _, v in ipairs(arg) do
+        if type(v) == 'table' then
+            for tk, tv in pairs(v) do
+                if type(tv) == 'table' then
+                    newTable[tk] = tableAssignDeep(newTable[tk] or {}, tv)
+                else
+                    newTable[tk] = tv
+                end
+            end
+        end
+    end
+
+    return newTable
+end
+
 local function tableAssign(...)
     local newTable = {}
     local arg = {...}
 
-    for k, v in pairs(arg) do
+    for _, v in ipairs(arg) do
         if type(v) == 'table' then
             for tk, tv in pairs(v) do
                 newTable[tk] = tv
@@ -156,6 +175,33 @@ local function tableAssign(...)
     end
 
     return newTable
+end
+
+local function tableAssignShallow(...)
+    local newTable = {}
+    local arg = {...}
+
+    for _, v in ipairs(arg) do
+        if type(v) == 'table' then
+            for tk, tv in pairs(v) do
+                if type(tv) == 'table' then
+                    newTable[tk] = tableAssign(newTable[tk] or {}, tv)
+                else
+                    newTable[tk] = tv
+                end
+            end
+        end
+    end
+
+    return newTable
+end
+
+local function tableCountFields(tbl)
+    local count = 0
+    for _, _ in pairs(tbl) do
+        count = count + 1
+    end
+    return count
 end
 
 local helpers = {
@@ -176,7 +222,10 @@ local helpers = {
     dump = dump,
     compareVectors = compareVectors,
     tableAssign = tableAssign,
+    tableAssignDeep = tableAssignDeep,
+    tableAssignShallow = tableAssignShallow,
     min = min,
+    tableCountFields = tableCountFields,
 }
 
 return helpers

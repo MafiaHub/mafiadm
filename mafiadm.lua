@@ -21,7 +21,7 @@ Modes = require("modes")
 Settings = require("settings")
 
 -- Replace them with per-mission settings
-Settings = Helpers.tableAssign(Settings, require("mapload"))
+Settings = Helpers.tableAssignDeep(Settings, require("mapload"))
 
 PlayerStates = {
 	SELECTING_TEAM = 1,
@@ -108,7 +108,7 @@ function InitMode(mode)
 		modeInfo = require("modes/tdm")
 	end
 
-	Game = Helpers.tableAssign(Game, modeInfo)
+	Game = Helpers.tableAssignDeep(Game, modeInfo)
 end
 
 function inTeamColor(team, text)
@@ -120,7 +120,7 @@ Teams.tt.inTeamColor = inTeamColor
 Teams.ct.inTeamColor = inTeamColor
 
 function sendSelectTeamMessage(player)
-	if Settings.TEAMS.AUTOBALANCE == true then
+	if Settings.TEAMS.AUTOASSIGN == true then
 		return
 	end
 
@@ -248,7 +248,7 @@ end
 function assignPlayerToTeam(player, team)
 	removePlayerFromTeam(player)
 
-	if Settings.TEAMS.AUTOBALANCE == true and team == Teams.none then
+	if Settings.TEAMS.AUTOASSIGN == true and team == Teams.none then
 		team = Teams.ct.numPlayers < Teams.tt.numPlayers and Teams.ct or Teams.tt
 	end
 
@@ -506,10 +506,46 @@ function handleDyingOrDisconnect(playerId, inflictorId, damage, hitType, bodyPar
 	end
 end
 
+local function autobalancePlayers()
+	if not Settings.TEAMS.AUTOBALANCE then
+		return
+	end
+
+	local ctNumPlayers = Teams.ct.numPlayers
+	local ttNumPlayers = Teams.tt.numPlayers
+
+	if ctNumPlayers == ttNumPlayers then
+		return
+	end
+
+	if ctNumPlayers > ttNumPlayers then
+		local numToMove = ctNumPlayers - ttNumPlayers
+		for i=numToMove, 0, -1 do
+			local player = table.getn(Teams.ct.players, Teams.ct.numPlayers)
+			if player then
+				assignPlayerToTeam(player, getOppositeTeam(player.team))
+			end
+		end
+	else
+		local numToMove = ttNumPlayers - ctNumPlayers
+		for i=numToMove, 0, -1 do
+			local player = table.getn(Teams.tt.players, Teams.tt.numPlayers)
+			if player then
+				assignPlayerToTeam(player, getOppositeTeam(player.team))
+			end
+		end
+	end
+
+	sendClientMessageToAll("Teams have been rebalanced!")
+end
+
 local function updateGame()
 	if Game.state == GameStates.WAITING_FOR_PLAYERS then
 		if (Teams.tt.numPlayers >= Settings.MIN_PLAYER_AMOUNT_PER_TEAM and Teams.ct.numPlayers >= Settings.MIN_PLAYER_AMOUNT_PER_TEAM) or Game.skipTeamReq then
 			Game.skipTeamReq = false
+
+			autobalancePlayers()
+
 			for _, player in pairs(Players) do
 				if player.team ~= Teams.none then
 					if player.isSpawned and player.state == PlayerStates.DEAD then
@@ -550,6 +586,14 @@ local function updateGame()
 			else
 				Game.state = GameStates.BUY_TIME
 				WaitTime = Settings.WAIT_TIME.BUYING + CurTime
+			end
+		else
+			for _, player in pairs(Players) do
+				local numPlayers = Helpers.tableCountFields(Players)
+
+				if numPlayers < Settings.MIN_PLAYER_AMOUNT_PER_TEAM*2 then
+					addHudAnnounceMessage(player, string.format("Waiting for %d more players", Settings.MIN_PLAYER_AMOUNT_PER_TEAM*2 - numPlayers))
+				end
 			end
 		end
 	elseif Game.state == GameStates.ROUND then
@@ -772,7 +816,7 @@ function onPlayerConnected(playerId)
 		return
 	end
 
-	local welcomeMessage = string.format('#FF0000[GM]#FFFFFF player #00FF00**%s** #FFFFFFhas connected to the server :)', humanGetName(playerId))
+	local welcomeMessage = string.format('#FF0000[GM]#FFFFFF Player #00FF00**%s** #FFFFFFhas connected to the server :)', humanGetName(playerId))
 	--sendClientMessageToAllWithStates(welcomeMessage, PlayerStates.SELECTING_TEAM, PlayerStates.DEAD, PlayerStates.WAITING_FOR_ROUND, PlayerStates.SPECTATING)
 	sendClientMessageToAll(welcomeMessage)
 
@@ -799,7 +843,7 @@ function onPlayerConnected(playerId)
 
 	sendClientMessage(playerId, "#FFFF00 Welcome to MafiaDM")
 
-	if Settings.TEAMS.AUTOBALANCE == true then
+	if Settings.TEAMS.AUTOASSIGN == true then
 		assignPlayerToTeam(player, Teams.none)
 	else
 		sendSelectTeamMessage(player)
@@ -809,6 +853,14 @@ function onPlayerConnected(playerId)
 
 	if Settings.WELCOME_CAMERA then
     	cameraInterpolate(playerId, Settings.WELCOME_CAMERA.START.POS, Settings.WELCOME_CAMERA.START.ROT, Settings.WELCOME_CAMERA.STOP.POS, Settings.WELCOME_CAMERA.STOP.ROT, Settings.WELCOME_CAMERA.TIME)
+	end
+
+	if Game.state == GameStates.WAITING_FOR_PLAYERS then
+		local numPlayers = Helpers.tableCountFields(Players)
+
+		if numPlayers < Settings.MIN_PLAYER_AMOUNT_PER_TEAM*2 then
+			sendClientMessageToAll(string.format('#FF0000[GM]#FFFFFF We need %d more players to start the round!', Settings.MIN_PLAYER_AMOUNT_PER_TEAM*2 - numPlayers))
+		end
 	end
 end
 

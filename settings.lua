@@ -3,6 +3,10 @@
 local Modes = require("modes")
 
 local settings = {
+    TEAMS = {
+        AUTOASSIGN = false, -- auto-assign player to team on join
+        AUTOBALANCE = true, -- rebalance teams if there are more players on one team than on another
+    },
     SOUNDS = {
         START_PLANT = {
             FILE = "plant.wav",
