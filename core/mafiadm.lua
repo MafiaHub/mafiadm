@@ -36,50 +36,28 @@ GameStates = {
 
 ---------------VARIABLES---------------
 
-Teams = {
-	none = {
-		name = Settings.TEAMS.NONE.NAME,
-		shortName = "none",
-		msgColor = Settings.TEAMS.NONE.COLOR,
-		models = Settings.TEAMS.NONE.MODELS,
+Teams = {}
+
+local function setupTeam(team, name)
+	return {
+		name = team.NAME,
+		shortName = name,
+		msgColor = team.COLOR,
+		models = team.MODELS,
 		score = 0,
 		wonLast = false,
 		winRow = 0,
 		players = { },
 		numPlayers = 0,
-		spawnPoints = Settings.TEAMS.NONE.SPAWN_POINTS,
-		spawnArea = Settings.TEAMS.NONE.SPAWN_AREA,
-		spawnDir = Settings.TEAMS.NONE.SPAWN_DIR
-	},
-	tt = {
-		name = Settings.TEAMS.TT.NAME,
-		shortName = "tt",
-		msgColor = Settings.TEAMS.TT.COLOR,
-		models = Settings.TEAMS.TT.MODELS,
-		score = 0,
-		wonLast = false,
-		winRow = 0,
-		players = { },
-		numPlayers = 0,
-		spawnPoints = Settings.TEAMS.TT.SPAWN_POINTS,
-		spawnArea = Settings.TEAMS.TT.SPAWN_AREA,
-		spawnDir = Settings.TEAMS.TT.SPAWN_DIR
-	},
-	ct = {
-		name = Settings.TEAMS.CT.NAME,
-		shortName = "ct",
-		msgColor = Settings.TEAMS.CT.COLOR,
-		models = Settings.TEAMS.CT.MODELS,
-		score = 0,
-		wonLast = false,
-		winRow = 0,
-		players = { },
-		numPlayers = 0,
-		spawnPoints = Settings.TEAMS.CT.SPAWN_POINTS,
-		spawnArea = Settings.TEAMS.CT.SPAWN_AREA,
-		spawnDir = Settings.TEAMS.CT.SPAWN_DIR
+		spawnPoints = team.SPAWN_POINTS,
+		spawnArea = team.SPAWN_AREA,
+		spawnDir = team.SPAWN_DIR
 	}
-}
+end
+
+Teams.none = setupTeam(Settings.TEAMS.NONE, "none")
+Teams.tt = setupTeam(Settings.TEAMS.TT, "tt")
+Teams.ct = setupTeam(Settings.TEAMS.CT, "ct")
 
 Game = {
 	state = GameStates.WAITING_FOR_PLAYERS,
