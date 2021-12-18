@@ -106,6 +106,8 @@ function InitMode(mode)
 		modeInfo = require("modes/bomb")
 	elseif mode == Modes.TDM then
 		modeInfo = require("modes/tdm")
+	elseif mode == Modes.KO then
+		modeInfo = require("modes/elimination")
 	end
 
 	Game = Helpers.tableAssignDeep(Game, modeInfo)
