@@ -707,7 +707,11 @@ function updateGame()
 			for _, player in pairs(Players) do
 				if player.state == PlayerStates.IN_ROUND then
 					if Helpers.isPointInCuboid(humanGetPos(player.id), player.team.spawnAreaCheck) then
-						addHudAnnounceMessage(player, string.format("Buy zone - %.2fs", Game.roundBuyShopTime - CurTime))
+						if Settings.PLAYER_SHOP_IN_ROUND_NOLIMIT then
+							addHudAnnounceMessage(player, "Buy zone")
+						else
+							addHudAnnounceMessage(player, string.format("Buy zone - %.2fs", Game.roundBuyShopTime - CurTime))
+						end
 					end
 				end
 			end
