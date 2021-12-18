@@ -216,7 +216,7 @@ local function tableGetIndex(tbl, idx)
     return nil
 end
 
-local helpers = {
+return {
     distanceSquared = distanceSquared,
     distance = distance,
     deepCopy = deepCopy,
@@ -240,5 +240,3 @@ local helpers = {
     tableCountFields = tableCountFields,
     tableGetIndex = tableGetIndex,
 }
-
-return helpers
