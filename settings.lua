@@ -37,6 +37,13 @@ local settings = {
         BLAST_FORCE = 500,
         MODEL = "2bomb.i3d"
     },
+    FLAG = {
+        MODELS = {
+            RED = "REDflag.i3d",
+            BLUE = "BLUEflag.i3d",
+        },
+        PLACE_RADIUS = 1.5,
+    },
     HEALTH_PICKUP = {
         HEALTH = 25,
         RESPAWN_TIME = 90.0,
@@ -56,6 +63,7 @@ local settings = {
         BOMB = 40.0,
         AFK_DROP_BOMB = 15.0,
         PICKUP_BOMB = 5.0,
+        PICKUP_FLAG = 5.0,
         BUYING = 30.0,
         END_ROUND = 10.0,
         AFTER_DEATH_RESPAWN = 5.0,
@@ -69,6 +77,8 @@ local settings = {
     PLAYER_DISABLE_ECONOMY = false,
     PLAYER_STARTING_MONEY = 1000,
     PLAYER_MAX_MONEY = 16000,
+    PLAYER_RESPAWN_AFTER_DEATH = false,
+    WIN_CONDITION_TIME = false,
     NORMAL_WEAPONS_RUN_SPEED = 1.0,
     HEAVY_WEAPONS_RUN_SPEED = 0.8,
     HEAVY_WEAPONS = {

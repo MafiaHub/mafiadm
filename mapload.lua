@@ -1,5 +1,5 @@
 -- SPECIFY WHICH MAP TO LOAD FROM CFG FOLDER
-local MAPNAME = "tdm_test"
+local MAPNAME = "ctf_test"
 
 -- KEEP THE REST OF THE FILE AS IS.
 return require("maps/" .. MAPNAME)

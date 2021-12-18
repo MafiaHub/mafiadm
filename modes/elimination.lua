@@ -46,6 +46,9 @@ local function teamWin(team)
 end
 
 return {
+    init = function ()
+    end,
+
     update = function ()
     end,
 

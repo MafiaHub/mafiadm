@@ -188,6 +188,9 @@ return {
         defuser = nil
     },
 
+    init = function ()
+    end,
+
     update = function ()
         if Game.state == GameStates.WAITING_FOR_PLAYERS then
             despawnBomb()

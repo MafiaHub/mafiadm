@@ -108,6 +108,8 @@ function InitMode(mode)
 		modeInfo = require("modes/tdm")
 	elseif mode == Modes.KO then
 		modeInfo = require("modes/elimination")
+	elseif mode == Modes.CTF then
+		modeInfo = require("modes/ctf")
 	end
 
 	Game = Helpers.tableAssignDeep(Game, modeInfo)
@@ -494,6 +496,10 @@ function handleDyingOrDisconnect(playerId, inflictorId, damage, hitType, bodyPar
 
 	Game.diePlayer(player)
 
+	if Settings.PLAYER_RESPAWN_AFTER_DEATH then
+		player.deadTime = CurTime + Settings.WAIT_TIME.AFTER_DEATH_RESPAWN
+	end
+
 	for _, item in pairs(inventory) do
 		local weaponId = item.weaponId
 		if weaponId > 1 and inventoryRemoveWeapon(playerId, weaponId) then
@@ -543,6 +549,10 @@ local function autobalancePlayers()
 	local ttNumPlayers = Teams.tt.numPlayers
 
 	if ctNumPlayers == ttNumPlayers then
+		return
+	end
+
+	if math.abs(ctNumPlayers-ttNumPlayers) < 2 then
 		return
 	end
 
@@ -603,14 +613,6 @@ local function updateGame()
 				end
 			end
 		end
-	elseif Game.state == GameStates.ROUND then
-		for _, healthPickup in ipairs(Game.healthPickups) do
-			if healthPickup.id == nil and healthPickup.time < CurTime then
-				healthPickup.id = pickupCreate(healthPickup.pos, Settings.HEALTH_PICKUP.MODEL)
-			end
-		end
-
-		Game.updateGameState(Game.state)
 	elseif Game.state == GameStates.BUY_TIME then
 		for _, player in pairs(Players) do
 			addHudAnnounceMessage(player, string.format("Buy time - %.2fs", WaitTime - CurTime))
@@ -633,7 +635,49 @@ local function updateGame()
 				WaitTime = Settings.WAIT_TIME.ROUND + CurTime
 			end
 		end
+	elseif Game.state == GameStates.ROUND then
+		for _, healthPickup in ipairs(Game.healthPickups) do
+			if healthPickup.id == nil and healthPickup.time < CurTime then
+				healthPickup.id = pickupCreate(healthPickup.pos, Settings.HEALTH_PICKUP.MODEL)
+			end
+		end
 
+		Game.updateGameState(Game.state)
+
+		if Settings.PLAYER_RESPAWN_AFTER_DEATH then
+			for _, player in pairs(Players) do
+				if player.state == PlayerStates.DEAD and player.deadTime < CurTime then
+					spawnPlayer(player)
+				elseif player.state == PlayerStates.DEAD then
+					addHudAnnounceMessage(player, string.format("%.2fs left until respawn", player.deadTime - CurTime))
+				end
+			end
+		end
+
+		if Settings.WIN_CONDITION_TIME then
+			if CurTime > WaitTime then
+				local ttScore = Teams.tt.score
+				local ctScore = Teams.ct.score
+
+				local team = nil
+				if ttScore > ctScore then
+					team = Teams.tt
+				elseif ctScore > ttScore then
+					team = Teams.ct
+				end
+
+				if team then
+					sendClientMessageToAll(team:inTeamColor() .. " win!")
+					sendClientMessageToAll(string.format("%s %d : %d %s", Teams.tt:inTeamColor(), Teams.tt.score, Teams.ct.score, Teams.ct:inTeamColor()))
+				else
+					sendClientMessageToAll("It's a draw!")
+					sendClientMessageToAll(string.format("%s %d : %d %s", Teams.tt:inTeamColor(), Teams.tt.score, Teams.ct.score, Teams.ct:inTeamColor()))
+				end
+
+				Game.state = GameStates.AFTER_GAME
+				WaitTime = Settings.WAIT_TIME.END_GAME + CurTime
+			end
+		end
 	elseif Game.state == GameStates.AFTER_ROUND then
 		if WaitTime > CurTime then
 			for _, player in pairs(Players) do
@@ -814,6 +858,7 @@ function onScriptStart()
 	InitMode(Settings.MODE)
 	EmptyGame = Helpers.deepCopy(Game)
 	startGame()
+	Game.init()
 	print("MafiaDM was initialised!\n")
 end
 
@@ -848,7 +893,8 @@ function onPlayerConnected(playerId)
 		lastDir = nil,
 		timeIdleStart = nil,
 		hudAnnounceMessage = nil,
-		kills = 0
+		kills = 0,
+		deadTime = 0.0
 	}
 
 	player = Helpers.tableAssign(player, Game.initPlayer())
