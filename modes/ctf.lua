@@ -139,6 +139,10 @@ return {
     end,
 
     update = function ()
+        if Game.state == GameStates.WAITING_FOR_PLAYERS then
+            despawnFlag(Game.ctf.flags.red)
+            despawnFlag(Game.ctf.flags.blue)
+        end
     end,
 
     updateGameState = function (state)
@@ -150,6 +154,11 @@ return {
         elseif state == GameStates.ROUND then
             for _, player in pairs(Players) do
                 addHudAnnounceMessage(player, string.format("TT %d : CT %d\n%.2fs", Teams.tt.score, Teams.ct.score, WaitTime - CurTime))
+            end
+        elseif state == GameStates.AFTER_GAME then
+            if WaitTime < CurTime then
+                despawnFlag(Game.ctf.flags.red)
+                despawnFlag(Game.ctf.flags.blue)
             end
         end
 
@@ -168,10 +177,6 @@ return {
         end
     end,
 
-    handleSpecialBuy = function (player, weapon)
-        return false
-    end,
-
     initPlayer = function ()
         return {
             hasFlag = false,
@@ -183,9 +188,6 @@ return {
     onPlayerInsidePickupRadius = function (playerId, pickupId)
         local player = Players[playerId]
         pickupFlag(player, pickupId)
-    end,
-
-    onPlayerKeyPress = function (player, isDown, key)
     end,
 
     diePlayer = function (player)

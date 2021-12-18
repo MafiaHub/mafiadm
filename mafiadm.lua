@@ -85,6 +85,37 @@ Game = {
 	buyMenuPages = {},
 	skipTeamReq = false,
 	pauseGame = false,
+
+	-- stubs
+	init = function ()
+    end,
+
+    update = function ()
+    end,
+
+    updateGameState = function (state)
+        return false
+    end,
+
+    updatePlayer = function (player)
+    end,
+
+    handleSpecialBuy = function (player, weapon)
+        return false
+    end,
+
+    initPlayer = function ()
+        return {}
+    end,
+
+    onPlayerInsidePickupRadius = function (playerId, pickupId)
+    end,
+
+    onPlayerKeyPress = function (player, isDown, key)
+    end,
+
+    diePlayer = function (player)
+    end
 }
 
 EmptyGame = nil
@@ -701,6 +732,8 @@ local function updateGame()
 				end
 			end
 		else
+			Game.updateGameState(Game.state)
+
 			Teams.tt.score = 0
 			Teams.tt.winRow = 0
 			Teams.tt.wonLast = false
@@ -710,7 +743,6 @@ local function updateGame()
 			Teams.ct.wonLast = false
 
 			clearUpPickups()
-			Game.updateGameState(Game.state)
 
 			for _, player in pairs(Players) do
 				player.money = Settings.PLAYER_STARTING_MONEY
