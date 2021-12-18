@@ -132,18 +132,8 @@ cmds = {}
 ---@diagnostic disable: lowercase-global
 
 function InitMode(mode)
-	local modeInfo = nil
-	if mode == Modes.BOMB then
-		modeInfo = require("modes/bomb")
-	elseif mode == Modes.TDM then
-		modeInfo = require("modes/tdm")
-	elseif mode == Modes.KO then
-		modeInfo = require("modes/elimination")
-	elseif mode == Modes.CTF then
-		modeInfo = require("modes/ctf")
-	end
-
-	Game = Helpers.tableAssignDeep(Game, modeInfo)
+	print("\nLoading mode: " .. mode)
+	Game = Helpers.tableAssignDeep(Game, require("modes/" .. mode))
 end
 
 function inTeamColor(team, text)
