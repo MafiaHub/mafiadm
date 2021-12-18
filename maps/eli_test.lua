@@ -1,4 +1,4 @@
-local settings = {
+return {
     MISSION = "MISE15-PRISTAV",
     MODE = Modes.KO,
     TEAMS = {
@@ -38,5 +38,3 @@ local settings = {
     },
     MAX_TEAM_SCORE = 15,
 }
-
-return settings

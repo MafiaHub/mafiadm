@@ -1,4 +1,4 @@
-local settings = {
+return {
     MISSION = "DE_DUST2",
     MODE = Modes.BOMB,
     TEAMS = {
@@ -27,5 +27,3 @@ local settings = {
         TIME = 20000,
     },
 }
-
-return settings

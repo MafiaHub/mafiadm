@@ -1,4 +1,4 @@
-local settings = {
+return {
     MISSION = "MISE15-PRISTAV",
     MODE = Modes.CTF,
     TEAMS = {
@@ -42,5 +42,3 @@ local settings = {
     },
     MAX_TEAM_SCORE = 50,
 }
-
-return settings

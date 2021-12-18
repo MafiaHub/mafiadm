@@ -1,4 +1,4 @@
-local settings = {
+return {
     MISSION = "MISE15-PRISTAV",
     MODE = Modes.BOMB,
     TEAMS = {
@@ -43,5 +43,3 @@ local settings = {
         ROUND = 999.0
     }
 }
-
-return settings

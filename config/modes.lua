@@ -1,8 +1,6 @@
-local Modes = {
+return {
     BOMB = "bomb",
     TDM = "tdm",
     KO = "elimination",
     CTF = "ctf",
 }
-
-return Modes
