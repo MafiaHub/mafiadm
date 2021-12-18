@@ -35,9 +35,8 @@ local function setPlayerPos(playerId, pos)
 end
 
 local function validateStats()
-    -- TODO
     for playerId, stats in pairs(playerStats) do
-        
+        -- TODO
     end
 end
 

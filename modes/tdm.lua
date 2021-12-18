@@ -1,6 +1,3 @@
-local function teamWin(team)
-end
-
 return {
     init = function ()
         -- Team deathmatch doesn't really work with economy

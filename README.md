@@ -15,3 +15,8 @@ Currently hosts these gamemodes:
 3. Set `map` to `TUTORIAL`
 4. Open **<mod_path>/init.lua** and set **MAPNAME** to your desired map from `<mod_path>/maps`
 5. Have a look at **<mod_path>/config/settings.lua** for more settings
+
+## Credits
+
+Huge thanks to [@NanobotZ](https://github.com/nanobotz/) for implementing the CS:GO inspired bomb-defusal gamemode and [@saska](https://www.youtube.com/channel/UCn-RCjui_E6TOBXpGtxcJfg) for various assets used by this framework.
+See [LICENSE](LICENSE) for more information regarding licensing.
