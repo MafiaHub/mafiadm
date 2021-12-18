@@ -204,6 +204,18 @@ local function tableCountFields(tbl)
     return count
 end
 
+local function tableGetIndex(tbl, idx)
+    local count = 1
+    for _, v in pairs(tbl) do
+        if count == idx then
+            return v
+        end
+        count = count + 1
+    end
+
+    return nil
+end
+
 local helpers = {
     distanceSquared = distanceSquared,
     distance = distance,
@@ -226,6 +238,7 @@ local helpers = {
     tableAssignShallow = tableAssignShallow,
     min = min,
     tableCountFields = tableCountFields,
+    tableGetIndex = tableGetIndex,
 }
 
 return helpers
