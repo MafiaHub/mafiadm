@@ -1,4 +1,4 @@
-local VirtualKeys = {
+return {
 	LeftButton = 0x01,
 	RightButton = 0x02,
 	Cancel = 0x03,
@@ -196,5 +196,3 @@ local VirtualKeys = {
 	PA1 = 0xFD,
 	OEMClear = 0xFE
 }
-
-return VirtualKeys
