@@ -108,6 +108,9 @@ return {
 
         -- Allow time-based win condition
         Settings.GAME_WIN_CONDITION_TIME = true
+
+        -- Allow shops without time limit
+        Settings.PLAYER_SHOP_IN_ROUND_NOLIMIT = true
     end,
 
     update = function ()
