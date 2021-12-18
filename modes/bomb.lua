@@ -38,41 +38,19 @@ local function dropBomb(player)
 end
 
 local function teamWin(team, bombPlanted, bombExploded)
-	team.score = team.score + 1
+    advance.round(team, function (team)
+        local oppositeTeam = getOppositeTeam(team)
 
-	sendClientMessageToAll(team:inTeamColor() .. " win!")
-	sendClientMessageToAll(string.format("%s %d : %d %s", Teams.tt:inTeamColor(), Teams.tt.score, Teams.ct.score, Teams.ct:inTeamColor()))
+        local paymentInfo = Settings.ROUND_PAYMENT[team.shortName][team.winRow > 5 and 5 or team.winRow]
+        local winMoney = paymentInfo.win + (bombPlanted and paymentInfo.bomb_plant or 0) + (bombExploded and paymentInfo.bomb_detonate or 0)
+        paymentInfo = Settings.ROUND_PAYMENT[oppositeTeam.shortName][team.winRow > 5 and 5 or team.winRow] -- using team here intentionally to get correct loss
+        local lossMoney = paymentInfo.loss + (bombPlanted and paymentInfo.bomb_plant or 0) + (bombExploded and paymentInfo.bomb_detonate or 0)
 
-	local oppositeTeam = getOppositeTeam(team)
-
-	if not team.wonLast then
-		team.wonLast = true
-		team.winRow = 1
-		oppositeTeam.wonLast = false
-		oppositeTeam.winRow = 0
-	else
-		team.winRow = team.winRow + 1
-	end
-
-	local paymentInfo = Settings.ROUND_PAYMENT[team.shortName][team.winRow > 5 and 5 or team.winRow]
-	local winMoney = paymentInfo.win + (bombPlanted and paymentInfo.bomb_plant or 0) + (bombExploded and paymentInfo.bomb_detonate or 0)
-	for _, player in pairs(team.players) do
-		addPlayerMoney(player, winMoney, "You've won the round and got")
-	end
-
-	paymentInfo = Settings.ROUND_PAYMENT[oppositeTeam.shortName][team.winRow > 5 and 5 or team.winRow] -- using team here intentionally to get correct loss
-	local lossMoney = paymentInfo.loss + (bombPlanted and paymentInfo.bomb_plant or 0) + (bombExploded and paymentInfo.bomb_detonate or 0)
-	for _, player in pairs(oppositeTeam.players) do
-		addPlayerMoney(player, lossMoney, "You've lost the round and got")
-	end
-
-	if team.score >= Settings.MAX_TEAM_SCORE then
-		Game.state = GameStates.AFTER_GAME
-		WaitTime = Settings.WAIT_TIME.END_GAME + CurTime
-	else
-		Game.state = GameStates.AFTER_ROUND
-		WaitTime = Settings.WAIT_TIME.END_ROUND + CurTime
-	end
+        return {
+            win = winMoney,
+            loss = lossMoney
+        }
+    end)
 end
 
 local function stopDefusing()
@@ -187,9 +165,6 @@ return {
         model = Settings.BOMB.MODEL,
         defuser = nil
     },
-
-    init = function ()
-    end,
 
     update = function ()
         if Game.state == GameStates.WAITING_FOR_PLAYERS then

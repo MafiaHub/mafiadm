@@ -1,13 +1,4 @@
 local function teamWin(team)
-	team.score = team.score + 1
-
-	if team.score >= Settings.MAX_TEAM_SCORE then
-		Game.state = GameStates.AFTER_GAME
-		WaitTime = Settings.WAIT_TIME.END_GAME + CurTime
-
-        sendClientMessageToAll(team:inTeamColor() .. " win!")
-	    sendClientMessageToAll(string.format("%s %d : %d %s", Teams.tt:inTeamColor(), Teams.tt.score, Teams.ct.score, Teams.ct:inTeamColor()))
-	end
 end
 
 return {
@@ -19,9 +10,7 @@ return {
         Settings.PLAYER_RESPAWN_AFTER_DEATH = true
 
         -- Allow time-based win condition
-        Settings.WIN_CONDITION_TIME = true
-    end,
-    update = function ()
+        Settings.GAME_WIN_CONDITION_TIME = true
     end,
 
     updateGameState = function (state)
@@ -34,26 +23,9 @@ return {
         return false
     end,
 
-    updatePlayer = function (player)
-    end,
-
-    handleSpecialBuy = function (player, weapon)
-        return false
-    end,
-
-    initPlayer = function ()
-        return {}
-    end,
-
-    onPlayerInsidePickupRadius = function (playerId, pickupId)
-    end,
-
-    onPlayerKeyPress = function (player, isDown, key)
-    end,
-
     diePlayer = function (player)
         if Game.state == GameStates.ROUND then
-            teamWin(getOppositeTeam(player.team))
+            advance.simple(getOppositeTeam(player.team))
         end
     end
 }

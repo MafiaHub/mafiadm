@@ -6,6 +6,20 @@ local settings = {
     TEAMS = {
         AUTOASSIGN = false, -- auto-assign player to team on join
         AUTOBALANCE = true, -- rebalance teams if there are more players on one team than on another
+        NONE = {
+            NAME = "None",
+            COLOR = "#FFFFFF"
+        },
+        TT = {
+            NAME = "Gangsters",
+            COLOR = "#FFFF80",
+            MODELS = { "Enemy04K.i3d", "Enemy06+.i3d", "Enemy08+.i3d", "Enemy10K.i3d", "Enemy12K.i3d", "TommyHAT.i3d" },
+        },
+        CT = {
+            NAME = "Cops",
+            COLOR = "#408CFF",
+            MODELS = { "pol01.i3d", "pol02.i3d", "pol03.i3d", "pol11.i3d", "pol12.i3d", "pol13.i3d" },
+        }
     },
     SOUNDS = {
         START_PLANT = {
@@ -78,7 +92,7 @@ local settings = {
     PLAYER_STARTING_MONEY = 1000,
     PLAYER_MAX_MONEY = 16000,
     PLAYER_RESPAWN_AFTER_DEATH = false,
-    WIN_CONDITION_TIME = false,
+    GAME_WIN_CONDITION_TIME = false,
     NORMAL_WEAPONS_RUN_SPEED = 1.0,
     HEAVY_WEAPONS_RUN_SPEED = 0.8,
     HEAVY_WEAPONS = {
@@ -120,7 +134,7 @@ local settings = {
             killReward = 1500,
             canBuy = { "tt" , "ct" }
         },
-        { 
+        {
             weaponId = 4,
             name = "Baseball Bat",
             page = "Melee",

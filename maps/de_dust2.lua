@@ -2,21 +2,11 @@ local settings = {
     MISSION = "DE_DUST2",
     MODE = Modes.BOMB,
     TEAMS = {
-        NONE = {
-            NAME = "None",
-            COLOR = "#FFFFFF"
-        },
         TT = {
-            NAME = "Gangsters",
-            COLOR = "#FFFF80",
-            MODELS = { "Enemy04K.i3d", "Enemy06+.i3d", "Enemy08+.i3d", "Enemy10K.i3d", "Enemy12K.i3d", "TommyHAT.i3d" },
             SPAWN_AREA = { {-12.897121; 3.092595; -7.727854}, {-4.540559; 3.092595; -16.911572} }, -- this consits of two points representing opposite corners of a not-rotated cuboid in 3D space
             SPAWN_DIR = { 0.900399, 0.000000, 0.435065 }
         },
         CT = {
-            NAME = "Cops",
-            COLOR = "#408CFF",
-            MODELS = { "pol01.i3d", "pol02.i3d", "pol03.i3d", "pol11.i3d", "pol12.i3d", "pol13.i3d" },
             SPAWN_AREA = { {15.84541; -4.300481; 81.080124}, {26.495136; -4.295822; 76.572525} }, -- this consits of two points representing opposite corners of a not-rotated cuboid in 3D space
             SPAWN_DIR = { 0.900399, 0.000000, 0.435065 }
         }

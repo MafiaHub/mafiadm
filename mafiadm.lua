@@ -239,6 +239,71 @@ function getOppositeTeam(team)
 	return team == Teams.ct and Teams.tt or Teams.ct
 end
 
+--@diagnostic disable-next-line: lowercase-global
+advance = {}
+
+-- Only use in non-round based (TDM, CTF) gamemodes !!
+function advance.simple(team)
+	team.score = team.score + 1
+
+	if team.score >= Settings.MAX_TEAM_SCORE then
+		Game.state = GameStates.AFTER_GAME
+		WaitTime = Settings.WAIT_TIME.END_GAME + CurTime
+
+        sendClientMessageToAll(team:inTeamColor() .. " win!")
+	    sendClientMessageToAll(string.format("%s %d : %d %s", Teams.tt:inTeamColor(), Teams.tt.score, Teams.ct.score, Teams.ct:inTeamColor()))
+	end
+end
+
+-- Only use in round based gamemodes !!
+function advance.round(team, moneyProc)
+	if team == Teams.none then
+		sendClientMessageToAll("It's a draw!")
+		sendClientMessageToAll(string.format("%s %d : %d %s", Teams.tt:inTeamColor(), Teams.tt.score, Teams.ct.score, Teams.ct:inTeamColor()))
+		local ctPaymentInfo = Settings.ROUND_PAYMENT.ct[team.winRow > 5 and 5 or team.winRow]
+		local ttPaymentInfo = Settings.ROUND_PAYMENT.tt[team.winRow > 5 and 5 or team.winRow]
+		teamAddPlayerMoney(Teams.ct, ctPaymentInfo.loss, "You've got")
+		teamAddPlayerMoney(Teams.tt, ttPaymentInfo.loss, "You've got")
+		return
+	end
+
+	team.score = team.score + 1
+
+	local oppositeTeam = getOppositeTeam(team)
+
+	if not team.wonLast then
+		team.wonLast = true
+		team.winRow = 1
+		oppositeTeam.wonLast = false
+		oppositeTeam.winRow = 0
+	else
+		team.winRow = team.winRow + 1
+	end
+
+	local moneyInfo = moneyProc(team)
+	local winMoney = moneyInfo.win
+	local lossMoney = moneyInfo.loss
+
+	sendClientMessageToAll(team:inTeamColor() .. " win!")
+	sendClientMessageToAll(string.format("%s %d : %d %s", Teams.tt:inTeamColor(), Teams.tt.score, Teams.ct.score, Teams.ct:inTeamColor()))
+
+	for _, player in pairs(team.players) do
+		addPlayerMoney(player, winMoney, "You've won the round and got")
+	end
+
+	for _, player in pairs(oppositeTeam.players) do
+		addPlayerMoney(player, lossMoney, "You've lost the round and got")
+	end
+
+	if team.score >= Settings.MAX_TEAM_SCORE then
+		Game.state = GameStates.AFTER_GAME
+		WaitTime = Settings.WAIT_TIME.END_GAME + CurTime
+	else
+		Game.state = GameStates.AFTER_ROUND
+		WaitTime = Settings.WAIT_TIME.END_ROUND + CurTime
+	end
+end
+
 function findPlayerWithUID(uid)
 	for _, player in pairs(Players) do
 		if player.uid == uid then
@@ -685,7 +750,7 @@ local function updateGame()
 			end
 		end
 
-		if Settings.WIN_CONDITION_TIME then
+		if Settings.GAME_WIN_CONDITION_TIME then
 			if CurTime > WaitTime then
 				local ttScore = Teams.tt.score
 				local ctScore = Teams.ct.score

@@ -1,20 +1,16 @@
 local settings = {
     MISSION = "MISE15-PRISTAV",
-    MODE = Modes.CTF,
+    MODE = Modes.KO,
     TEAMS = {
         AUTOASSIGN = true,
         TT = {
-            SPAWN_AREA = { {-1837.071, -4.7, -750.245}, {-1834.463, -4.7, -766.136} },
+            SPAWN_AREA = { {-1837.071, -4.7, -750.245}, {-1834.463, -4.7, -766.136} }, -- this consits of two points representing opposite corners of a not-rotated cuboid in 3D space
             SPAWN_DIR = { 0.900399, 0.000000, 0.435065 }
         },
         CT = {
-            SPAWN_AREA = { {-1857.230225; -4.7; -735.69043}, {-1863.850342; -4.7; -740.580566} },
+            SPAWN_AREA = { {-1857.230225; -4.7; -735.69043}, {-1863.850342; -4.7; -740.580566} }, -- this consits of two points representing opposite corners of a not-rotated cuboid in 3D space
             SPAWN_DIR = { 0.900399, 0.000000, 0.435065 }
         }
-    },
-    FLAGS = {
-        RED = {-1849.201660, -5.309030, -769.778564},
-        BLUE = {-1861.321411, -5.362978, -751.921265},
     },
     HEALTH_PICKUPS = {
         {-1856.507812, -5.309011, -762.003967},
@@ -40,7 +36,7 @@ local settings = {
         },
         TIME = 80000,
     },
-    MAX_TEAM_SCORE = 50,
+    MAX_TEAM_SCORE = 15,
 }
 
 return settings
