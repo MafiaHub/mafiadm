@@ -64,6 +64,7 @@ Game = {
 	roundTime = 0.0,
 	weaponPickups = {},
 	healthPickups = {},
+	buyWeaponPickups = {},
 	buyMenuPages = {},
 	skipTeamReq = false,
 	pauseGame = false,

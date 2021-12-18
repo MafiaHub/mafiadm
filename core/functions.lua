@@ -374,7 +374,7 @@ end
 
 function updatePlayers()
 	for _, player in pairs(Players) do
-		if player.isSpawned and player.state == PlayerStates.IN_ROUND then
+		if player and player.isSpawned and player.state == PlayerStates.IN_ROUND then
 			local curPos = humanGetPos(player.id)
 			local curDir = humanGetDir(player.id)
 
@@ -416,6 +416,32 @@ function findWeaponInfoInSettings(weaponId)
 	return nil
 end
 
+function buyWeapon(player, weapon)
+    if player and weapon then
+        print(player.money)
+        print(weapon.cost)
+        if player.money >= weapon.cost then
+            local bought = false
+            if weapon.special then
+                bought = Game.handleSpecialBuy(player, weapon)
+            else
+                if inventoryAddWeaponDefault(player.id, weapon.weaponId) then
+                    player.money = player.money - weapon.cost
+                    bought = true
+                    hudAddMessage(player.id, string.format("Bought %s for %d$, money left: %d$", weapon.name, weapon.cost, player.money), Helpers.rgbToColor(34, 207, 0))
+                else
+                    hudAddMessage(player.id, "Couldn't buy this weapon!", Helpers.rgbToColor(255, 38, 38))
+                end
+            end
+
+            return bought
+        else
+            hudAddMessage(player.id, "Couldn't afford to buy this weapon!", Helpers.rgbToColor(255, 38, 38))
+            return false
+        end
+    end
+end
+
 function startGame()
 	if Settings.HEALTH_PICKUPS then
 		for _, pickupPos in ipairs(Settings.HEALTH_PICKUPS) do
@@ -432,6 +458,16 @@ function startGame()
 		for _, pickup in ipairs(Settings.WEAPON_PICKUPS) do
 			local pickupId = weaponDropCreateDefault(pickup[2], pickup[1], Settings.WEAPON_PICKUP.RESPAWN_TIME)
 			table.insert(Game.weaponPickups, pickupId)
+		end
+	end
+
+    if Settings.BUY_WEAPON_PICKUPS then
+		for _, pickup in ipairs(Settings.BUY_WEAPON_PICKUPS) do
+			local pickupId = pickupCreate(pickup[1], findWeaponInfoInSettings(pickup[2]).model)
+			table.insert(Game.buyWeaponPickups, {
+                id = pickupId,
+                wepId = pickup[2],
+            })
 		end
 	end
 

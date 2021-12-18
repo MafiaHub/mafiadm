@@ -62,7 +62,9 @@ function onPlayerConnected(playerId)
 		timeIdleStart = nil,
 		hudAnnounceMessage = nil,
 		kills = 0,
-		deadTime = 0.0
+		deadTime = 0.0,
+        holdsBuyWeaponKey = false,
+        timeToBuyWeaponWithKey = 0.0,
 	}
 
 	player = Helpers.tableAssign(player, Game.initPlayer())
@@ -153,6 +155,12 @@ end
 
 ---@diagnostic disable-next-line: lowercase-global
 function onPlayerInsidePickupRadius(playerId, pickupId)
+    local player = Players[playerId]
+
+    if not player then
+        return
+    end
+
 	for _, healthPickup in ipairs(Game.healthPickups) do
 		if healthPickup.id == pickupId then
 			local player = Players[playerId]
@@ -165,6 +173,21 @@ function onPlayerInsidePickupRadius(playerId, pickupId)
 				healthPickup.id = nil
 				healthPickup.time = CurTime + Settings.HEALTH_PICKUP.RESPAWN_TIME
 			end
+		end
+	end
+
+    for _, buyWeaponPickup in ipairs(Game.buyWeaponPickups) do
+		if buyWeaponPickup.id == pickupId then
+            local weapon = findWeaponInfoInSettings(buyWeaponPickup.wepId)
+            if player.holdsBuyWeaponKey and player.timeToBuyWeaponWithKey < CurTime then
+                player.timeToBuyWeaponWithKey = CurTime + Settings.WAIT_TIME.BUY_PICKUP_WEAPON
+                player.holdsBuyWeaponKey = false
+                print(buyWeaponPickup.wepId)
+                buyWeapon(player, weapon)
+            elseif player.timeToBuyWeaponWithKey < CurTime then
+                addHudAnnounceMessage(player, string.format("Cost : %d", weapon.cost))
+                addHudAnnounceMessage(player, "Press ALT key to purchase the weapon!")
+            end
 		end
 	end
 
@@ -204,31 +227,21 @@ function onPlayerKeyPress(playerId, isDown, key)
 					sendBuyMenuMessage(player)
 				else
 					local weapon = player.buyMenuPage[key - VirtualKeys.N0]
-					if weapon then
-						if player.money >= weapon.cost then
-							local bought = false
-							if weapon.special then
-								bought = Game.handleSpecialBuy(player, weapon)
-							else
-								if inventoryAddWeaponDefault(player.id, weapon.weaponId) then
-									player.money = player.money - weapon.cost
-									bought = true
-									hudAddMessage(player.id, string.format("Bought %s for %d$, money left: %d$", weapon.name, weapon.cost, player.money), Helpers.rgbToColor(34, 207, 0))
-								else
-									hudAddMessage(player.id, "Couldn't buy this weapon!", Helpers.rgbToColor(255, 38, 38))
-								end
-							end
 
-							if bought then
-								sendBuyMenuMessage(player)
-							end
-						else
-							hudAddMessage(player.id, string.format("Not enough money to buy this weapon, weapon: %d$, you: %d$!", weapon.cost, player.money), Helpers.rgbToColor(255, 38, 38))
-						end
-					end
+                    if buyWeapon(player, weapon) then
+                        sendBuyMenuMessage(player)
+                    end
 				end
 			end
 		end
+    elseif Game.state == GameStates.ROUND then
+        if player.state == PlayerStates.IN_ROUND then
+            if (key == VirtualKeys.Menu) then
+                player.holdsBuyWeaponKey = isDown
+            elseif (key == VirtualKeys.M) and isDown then
+                hudAddMessage(player.id, string.format("Money: $%d", player.money), Helpers.rgbToColor(34, 207, 0))
+            end
+        end
 	elseif player.state == PlayerStates.SPECTATING or player.state == PlayerStates.WAITING_FOR_ROUND then
 		if isDown then
 			local order = nil
