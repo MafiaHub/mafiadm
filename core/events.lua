@@ -167,7 +167,7 @@ function onPlayerInsidePickupRadius(playerId, pickupId)
 
 			if humanGetHealth(playerId) < 100.0 then
 				humanSetHealth(playerId, Helpers.min(100.0, humanGetHealth(player.id) + Settings.HEALTH_PICKUP.HEALTH))
-				sendClientMessage(playerId, "#20E7E4You have used a health pickup!")
+				hudAddMessage(playerId, "You have used a health pickup!", 0x20E7E4)
 
 				pickupDestroy(pickupId)
 				healthPickup.id = nil
