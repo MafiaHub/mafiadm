@@ -64,6 +64,7 @@ local settings = {
             NO_KIT = 10.0
         }
     },
+    TDM_MAX_SCORE = 25,
     MIN_PLAYER_AMOUNT_PER_TEAM = 5,
     PLAYER_DISABLE_ECONOMY = false,
     PLAYER_STARTING_MONEY = 1000,
