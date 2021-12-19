@@ -18,8 +18,8 @@ function cmds.pos(player, ...)
 end
 
 function cmds.help(player)
-	sendClientMessage(player.id, "Press M to show your balance.")
-	sendClientMessage(player.id, "Press B to open shop menu (in buy zones).")
+	hudAddMessage(player.id, "Press M to show your balance.", 0xFFFFFF)
+	hudAddMessage(player.id, "Press B to open shop menu (in buy zones).", 0xFFFFFF)
 end
 
 function cmds.tskip(player, ...)
