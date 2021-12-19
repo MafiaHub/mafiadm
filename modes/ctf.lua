@@ -58,6 +58,7 @@ local function pickupFlag(player, pickupId)
     if pickupId == flag.id then
         if player.state == PlayerStates.IN_ROUND
             and not player.hasFlag
+            and (not flag.isTaken or (flag.isTaken and not flag.player))
             and not compareTeams(player.team, flag.team)
             and CurTime > player.timeToPickupFlag then
                 print(humanGetName(player.id) .. " captured the flag!")
