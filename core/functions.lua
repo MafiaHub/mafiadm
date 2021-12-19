@@ -600,6 +600,12 @@ local function autobalancePlayers()
 		return
 	end
 
+	for _, player in pairs(Players) do
+		if player.team == Teams.none then
+			autoAssignPlayerToTeam(player)
+		end
+	end
+
 	local ctNumPlayers = Teams.ct.numPlayers
 	local ttNumPlayers = Teams.tt.numPlayers
 
