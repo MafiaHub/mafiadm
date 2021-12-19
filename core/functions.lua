@@ -428,11 +428,11 @@ function updatePlayers()
 
 			local playerWeaponId = inventoryGetCurrentItem(player.id).weaponId
 			if Helpers.tableHasValue(Settings.HEAVY_WEAPONS, playerWeaponId) then
-				humanSetSpeed(player.id, Settings.HEAVY_WEAPONS_RUN_SPEED)
+				humanSetSpeed(player.id, Settings.HEAVY_WEAPONS_RUN_SPEED * Settings.PLAYER_SPEED_MULT)
 			elseif Helpers.tableHasValue(Settings.LIGHT_WEAPONS, playerWeaponId) then
-				humanSetSpeed(player.id, Settings.LIGHT_WEAPONS_RUN_SPEED)
+				humanSetSpeed(player.id, Settings.LIGHT_WEAPONS_RUN_SPEED * Settings.PLAYER_SPEED_MULT)
 			else
-				humanSetSpeed(player.id, Settings.NORMAL_WEAPONS_RUN_SPEED)
+				humanSetSpeed(player.id, Settings.NORMAL_WEAPONS_RUN_SPEED * Settings.PLAYER_SPEED_MULT)
 			end
 		end
 
@@ -467,7 +467,7 @@ function buyWeapon(player, weapon)
                     bought = true
                     hudAddMessage(player.id, string.format("Bought %s for %d$, money left: %d$", weapon.name, weapon.cost, player.money), Helpers.rgbToColor(34, 207, 0))
                 else
-                    hudAddMessage(player.id, "Couldn't buy this weapon!", Helpers.rgbToColor(255, 38, 38))
+                    hudAddMessage(player.id, "Couldn't buy this weapon! Not enough space in inventory!", Helpers.rgbToColor(255, 38, 38))
                 end
             end
 

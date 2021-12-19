@@ -29,5 +29,6 @@ return {
         },
         TIME = 80000,
     },
+    PLAYER_SPEED_MULT = 1.5,
     MAX_TEAM_SCORE = 16,
 }

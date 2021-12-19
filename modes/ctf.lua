@@ -73,6 +73,7 @@ local function pickupFlag(player, pickupId)
             and compareTeams(player.team, flag.team) then
                 print(humanGetName(player.id) .. " returned the flag!")
                 sendClientMessageToAllTeam(flag.team, string.format("%s has returned the flag!", humanGetName(player.id)))
+                addPlayerMoney(player, 250)
                 resetFlag(flag)
         end
     end
@@ -148,6 +149,7 @@ return {
                 sendClientMessageToAllTeam(player.team, string.format("%s has delivered the flag!", humanGetName(player.id)))
                 resetFlag(player.flag)
                 advance.simple(player.team)
+                addPlayerMoney(player, 500)
             end
         end
     end,

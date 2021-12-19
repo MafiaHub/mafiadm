@@ -17,6 +17,11 @@ function cmds.pos(player, ...)
 	end
 end
 
+function cmds.help(player)
+	sendClientMessage(player.id, "Press M to show your balance.")
+	sendClientMessage(player.id, "Press B to open shop menu (in buy zones).")
+end
+
 function cmds.tskip(player, ...)
 	if zac.isAdmin(player.uid) then
 		WaitTime = CurTime
