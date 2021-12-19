@@ -2,7 +2,6 @@ return {
     MISSION = "MISE10-LETISTE",
     MODE = Modes.CTF,
     TEAMS = {
-        AUTOASSIGN = true,
         TT = {
             SPAWN_AREA = { {162.923553, 0.510000, -91.959534}, {151.634399, 0.510000, -86.261284} },
             SPAWN_DIR = {-0.593453, 0.000000, 0.804868}
@@ -27,5 +26,5 @@ return {
         },
         TIME = 80000,
     },
-    MAX_TEAM_SCORE = 50,
+    MAX_TEAM_SCORE = 16,
 }
