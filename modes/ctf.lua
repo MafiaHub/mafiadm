@@ -58,7 +58,6 @@ local function pickupFlag(player, pickupId)
     if pickupId == flag.id then
         if player.state == PlayerStates.IN_ROUND
             and not player.hasFlag
-            and not flag.isTaken
             and not compareTeams(player.team, flag.team)
             and CurTime > player.timeToPickupFlag then
                 print(humanGetName(player.id) .. " captured the flag!")
@@ -73,7 +72,7 @@ local function pickupFlag(player, pickupId)
             and compareTeams(player.team, flag.team) then
                 print(humanGetName(player.id) .. " returned the flag!")
                 sendClientMessageToAllTeam(flag.team, string.format("%s has returned the flag!", humanGetName(player.id)))
-                addPlayerMoney(player, 250)
+                addPlayerMoney(player, 2000)
                 resetFlag(flag)
         end
     end
@@ -112,6 +111,9 @@ return {
 
         -- Allow shops without time limit
         Settings.PLAYER_SHOP_IN_ROUND_NOLIMIT = true
+
+        -- Allow players to hotjoin
+        Settings.PLAYER_HOTJOIN = true
     end,
 
     update = function ()
@@ -149,7 +151,7 @@ return {
                 sendClientMessageToAllTeam(player.team, string.format("%s has delivered the flag!", humanGetName(player.id)))
                 resetFlag(player.flag)
                 advance.simple(player.team)
-                addPlayerMoney(player, 500)
+                addPlayerMoney(player, 4000)
             end
         end
     end,

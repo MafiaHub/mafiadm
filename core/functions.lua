@@ -640,9 +640,8 @@ end
 
 function updateGame()
 	if Game.state == GameStates.WAITING_FOR_PLAYERS then
-		if (Teams.tt.numPlayers >= Settings.MIN_PLAYER_AMOUNT_PER_TEAM and Teams.ct.numPlayers >= Settings.MIN_PLAYER_AMOUNT_PER_TEAM) 
-			or Game.skipTeamReq
-			or Settings.PLAYER_HOTJOIN then
+		if (Teams.tt.numPlayers >= Settings.MIN_PLAYER_AMOUNT_PER_TEAM and Teams.ct.numPlayers >= Settings.MIN_PLAYER_AMOUNT_PER_TEAM)
+			or Game.skipTeamReq then
 			Game.skipTeamReq = false
 
 			autobalancePlayers()

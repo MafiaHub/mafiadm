@@ -93,6 +93,9 @@ function onPlayerConnected(playerId)
 			sendClientMessageToAll(string.format('#FF0000[GM]#FFFFFF We need %d more players to start the round!', Settings.MIN_PLAYER_AMOUNT_PER_TEAM*2 - numPlayers))
 		end
     elseif Settings.PLAYER_HOTJOIN then
+		if Settings.TEAMS.ENABLED then
+			autoAssignPlayerToTeam(player)
+		end
         spawnPlayer(player)
 	end
 end
