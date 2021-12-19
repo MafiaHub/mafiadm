@@ -612,16 +612,16 @@ local function autobalancePlayers()
 	end
 
 	if ctNumPlayers > ttNumPlayers then
-		local numToMove = ctNumPlayers - ttNumPlayers
-		for i=numToMove, 0, -1 do
+		local numToMove = (ctNumPlayers - ttNumPlayers) // 2
+		for i=numToMove, 1, -1 do
 			local player = Helpers.tableGetIndex(Teams.ct.players, Teams.ct.numPlayers)
 			if player then
 				assignPlayerToTeam(player, getOppositeTeam(player.team))
 			end
 		end
 	else
-		local numToMove = ttNumPlayers - ctNumPlayers
-		for i=numToMove, 0, -1 do
+		local numToMove = (ttNumPlayers - ctNumPlayers) // 2
+		for i=numToMove, 1, -1 do
 			local player = Helpers.tableGetIndex(Teams.tt.players, Teams.tt.numPlayers)
 			if player then
 				assignPlayerToTeam(player, getOppositeTeam(player.team))
