@@ -24,6 +24,9 @@ return {
 
         -- Allow shops without time limit
         Settings.PLAYER_SHOP_IN_ROUND_NOLIMIT = true
+
+        -- Ensure there's no min player count needed to start the game
+        Settings.MIN_PLAYER_AMOUNT_PER_TEAM = 0
     end,
 
     initPlayer = function ()
