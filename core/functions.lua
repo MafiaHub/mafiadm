@@ -236,7 +236,9 @@ function assignPlayerToTeam(player, team)
 	    sendClientMessage(player.id, "You are assigned to team " .. team:inTeamColor() .. "!")
     end
 
-	spectate(player, 1)
+	if Game.state ~= GameStates.WAITING_FOR_PLAYERS and not Settings.PLAYER_HOTJOIN then
+		spectate(player, 1)
+	end
 end
 
 function autoAssignPlayerToTeam(player)
