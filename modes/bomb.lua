@@ -3,38 +3,38 @@ local BEEP_A1 = 0.244017811416199
 local BEEP_A2 = 1.76379778668885
 
 local function despawnBomb()
-	if Game.bomb.pickupId == 0 then
-		return
-	end
+    if Game.bomb.pickupId == 0 then
+        return
+    end
 
-	if Game.bomb.player then
-		pickupDetach(Game.bomb.pickupId)
-		Game.bomb.player = nil
-	end
+    if Game.bomb.player then
+        pickupDetach(Game.bomb.pickupId)
+        Game.bomb.player = nil
+    end
 
-	pickupDestroy(Game.bomb.pickupId)
-	Game.bomb.pickupId = 0
-	Game.bomb.plantTime = 0
-	Game.bomb.pos = { 0.0, 0.0, 0.0 }
-	Game.bomb.defuser = nil
-	Game.bomb.timeToDefuse = 0
-	Game.bomb.timeToPlant = 0
-	Game.bomb.timeToTick = 0
+    pickupDestroy(Game.bomb.pickupId)
+    Game.bomb.pickupId = 0
+    Game.bomb.plantTime = 0
+    Game.bomb.pos = { 0.0, 0.0, 0.0 }
+    Game.bomb.defuser = nil
+    Game.bomb.timeToDefuse = 0
+    Game.bomb.timeToPlant = 0
+    Game.bomb.timeToTick = 0
 end
 
 local function dropBomb(player)
-	if player.hasBomb then
-		player.timeToPickupBomb = CurTime + Settings.WAIT_TIME.PICKUP_BOMB
+    if player.hasBomb then
+        player.timeToPickupBomb = CurTime + Settings.WAIT_TIME.PICKUP_BOMB
 
-		local pos = Helpers.addRandomVectorOffset(humanGetPos(player.id), {1.0, 0, 1.0}) -- IDEA don't use random, spawn it on a circle circumerence
-		pickupDetach(Game.bomb.pickupId)
-		pickupSetPos(Game.bomb.pickupId, pos)
+        local pos = Helpers.addRandomVectorOffset(humanGetPos(player.id), {1.0, 0, 1.0}) -- IDEA don't use random, spawn it on a circle circumerence
+        pickupDetach(Game.bomb.pickupId)
+        pickupSetPos(Game.bomb.pickupId, pos)
 
-		Game.bomb.player = nil
-		player.hasBomb = false
+        Game.bomb.player = nil
+        player.hasBomb = false
 
-		print(humanGetName(player.id) .. " dropped bomb")
-	end
+        print(humanGetName(player.id) .. " dropped bomb")
+    end
 end
 
 local function teamWin(team, bombPlanted, bombExploded)
@@ -54,102 +54,102 @@ local function teamWin(team, bombPlanted, bombExploded)
 end
 
 local function stopDefusing()
-	if Game.bomb.defuser and Game.bomb.defuser.state == PlayerStates.IN_ROUND then
-		humanLockControls(Game.bomb.defuser.id, false)
-		-- IDEA maybe send message to team that bomb is not being defused?
-	end
+    if Game.bomb.defuser and Game.bomb.defuser.state == PlayerStates.IN_ROUND then
+        humanLockControls(Game.bomb.defuser.id, false)
+        -- IDEA maybe send message to team that bomb is not being defused?
+    end
 
-	Game.bomb.timeToDefuse = 0
-	Game.bomb.defuser = nil
+    Game.bomb.timeToDefuse = 0
+    Game.bomb.defuser = nil
 end
 
 local function updateBomb()
-	if Game.bomb.plantTime ~= 0 then -- I know that I'm not really using onPlayerInsidePickupRadius, because it's called only for the first player in the radius, and if there's more than one inside radius - it can break the intended logic
-		if Game.bomb.defuser then
-			local defuser = Game.bomb.defuser
-			if (defuser.holdsDefusePlantKey and Helpers.distanceSquared(Game.bomb.pos, humanGetPos(Game.bomb.defuser.id)) <= Settings.DEFUSE_RANGE_SQUARED) then
-				if CurTime >= Game.bomb.timeToDefuse then
-					humanLockControls(defuser.id, false)
+    if Game.bomb.plantTime ~= 0 then -- I know that I'm not really using onPlayerInsidePickupRadius, because it's called only for the first player in the radius, and if there's more than one inside radius - it can break the intended logic
+        if Game.bomb.defuser then
+            local defuser = Game.bomb.defuser
+            if (defuser.holdsDefusePlantKey and Helpers.distanceSquared(Game.bomb.pos, humanGetPos(Game.bomb.defuser.id)) <= Settings.DEFUSE_RANGE_SQUARED) then
+                if CurTime >= Game.bomb.timeToDefuse then
+                    humanLockControls(defuser.id, false)
 
-					local defuserPos = humanGetPos(defuser.id)
-					for _, player in pairs(Players) do
-						playSoundRanged(player, defuserPos, Settings.SOUNDS.BOMB_DEFUSED)
-					end
+                    local defuserPos = humanGetPos(defuser.id)
+                    for _, player in pairs(Players) do
+                        playSoundRanged(player, defuserPos, Settings.SOUNDS.BOMB_DEFUSED)
+                    end
 
-					despawnBomb()
+                    despawnBomb()
 
-					if Game.state == GameStates.ROUND then
-						print("win cause of defuse")
-						teamWin(Teams.ct, true, false)
-						sendClientMessageToAll("Bomb defused, " .. Teams.ct:inTeamColor() .. " win!")
-					else
-						sendClientMessageToAll("Bomb defused!")
-					end
-				else
-					addHudAnnounceMessage(defuser, "Defusing!")
-					--humanLockControls(defuser.id, true)
-				end
-			else
-				stopDefusing()
-			end
-		end
+                    if Game.state == GameStates.ROUND then
+                        print("win cause of defuse")
+                        teamWin(Teams.ct, true, false)
+                        sendClientMessageToAll("Bomb defused, " .. Teams.ct:inTeamColor() .. " win!")
+                    else
+                        sendClientMessageToAll("Bomb defused!")
+                    end
+                else
+                    addHudAnnounceMessage(defuser, "Defusing!")
+                    --humanLockControls(defuser.id, true)
+                end
+            else
+                stopDefusing()
+            end
+        end
 
-		if not Game.bomb.defuser then
-			for _, player in pairs(Teams.ct.players) do
-				local dist = Helpers.distanceSquared(Game.bomb.pos, humanGetPos(player.id))
-				if (dist <= Settings.DEFUSE_RANGE_SQUARED) then
-					if player.holdsDefusePlantKey then
-						local defusingTime = player.hasDefuseKit and Settings.WAIT_TIME.DEFUSING.KIT or Settings.WAIT_TIME.DEFUSING.NO_KIT
-						Game.bomb.timeToDefuse = CurTime + defusingTime
-						Game.bomb.defuser = player
-						humanLockControls(player.id, true)
+        if not Game.bomb.defuser then
+            for _, player in pairs(Teams.ct.players) do
+                local dist = Helpers.distanceSquared(Game.bomb.pos, humanGetPos(player.id))
+                if (dist <= Settings.DEFUSE_RANGE_SQUARED) then
+                    if player.holdsDefusePlantKey then
+                        local defusingTime = player.hasDefuseKit and Settings.WAIT_TIME.DEFUSING.KIT or Settings.WAIT_TIME.DEFUSING.NO_KIT
+                        Game.bomb.timeToDefuse = CurTime + defusingTime
+                        Game.bomb.defuser = player
+                        humanLockControls(player.id, true)
 
-						local defuserPos = humanGetPos(player.id)
-						for _, player2 in pairs(Players) do
-							playSoundRanged(player2, defuserPos, Settings.SOUNDS.START_DEFUSE)
-						end
+                        local defuserPos = humanGetPos(player.id)
+                        for _, player2 in pairs(Players) do
+                            playSoundRanged(player2, defuserPos, Settings.SOUNDS.START_DEFUSE)
+                        end
 
-						break
-					else
-						addHudAnnounceMessage(player, "Hold ALT key to start defusing!")
-					end
-				end
-			end
-		end
+                        break
+                    else
+                        addHudAnnounceMessage(player, "Hold ALT key to start defusing!")
+                    end
+                end
+            end
+        end
 
-		if Game.bomb.plantTime ~= 0 and CurTime - Game.bomb.plantTime > Settings.WAIT_TIME.BOMB then
-			if Game.state == GameStates.ROUND then
-				print("win cause of boom")
-				teamWin(Teams.tt, true, true)
-				sendClientMessageToAll("Bomb exploded, " .. Teams.tt:inTeamColor() .. " win!")
-			else
-				sendClientMessageToAll("Bomb exploded!")
-			end
+        if Game.bomb.plantTime ~= 0 and CurTime - Game.bomb.plantTime > Settings.WAIT_TIME.BOMB then
+            if Game.state == GameStates.ROUND then
+                print("win cause of boom")
+                teamWin(Teams.tt, true, true)
+                sendClientMessageToAll("Bomb exploded, " .. Teams.tt:inTeamColor() .. " win!")
+            else
+                sendClientMessageToAll("Bomb exploded!")
+            end
 
-			createExplosion(Game.bomb.pos, 0, 0)
+            createExplosion(Game.bomb.pos, 0, 0)
 
-			for _, player in pairs(Players) do
-				playSoundRanged(player, Game.bomb.pos, Settings.SOUNDS.EXPLOSION)
+            for _, player in pairs(Players) do
+                playSoundRanged(player, Game.bomb.pos, Settings.SOUNDS.EXPLOSION)
 
-				if player.state == PlayerStates.IN_ROUND then
-					local distance = Helpers.distance(humanGetPos(player.id), Game.bomb.pos)
-					if distance < Settings.BOMB.BLAST_RADIUS then
-						local damage = Helpers.remapValue(distance, Settings.BOMB.BLAST_RADIUS, 0, 0, Settings.BOMB.BLAST_FORCE)
-						local health = humanGetHealth(player.id)
-						local newHealth = health - damage
+                if player.state == PlayerStates.IN_ROUND then
+                    local distance = Helpers.distance(humanGetPos(player.id), Game.bomb.pos)
+                    if distance < Settings.BOMB.BLAST_RADIUS then
+                        local damage = Helpers.remapValue(distance, Settings.BOMB.BLAST_RADIUS, 0, 0, Settings.BOMB.BLAST_FORCE)
+                        local health = humanGetHealth(player.id)
+                        local newHealth = health - damage
 
-						if newHealth < 0 then
-							humanDie(player.id)
-						else
-							humanSetHealth(player.id, health - damage)
-						end
-					end
-				end
-			end
+                        if newHealth < 0 then
+                            humanDie(player.id)
+                        else
+                            humanSetHealth(player.id, health - damage)
+                        end
+                    end
+                end
+            end
 
-			despawnBomb()
-		end
-	end
+            despawnBomb()
+        end
+    end
 end
 
 return {

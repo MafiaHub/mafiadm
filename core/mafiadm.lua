@@ -19,19 +19,19 @@ Settings = require("config/settings")
 Settings = Helpers.tableAssignDeep(Settings, require("maps/" .. MAPNAME))
 
 PlayerStates = {
-	SELECTING_TEAM = 1,
-	WAITING_FOR_ROUND = 2,
-	IN_ROUND = 3,
-	DEAD = 4,
-	SPECTATING = 5
+    SELECTING_TEAM = 1,
+    WAITING_FOR_ROUND = 2,
+    IN_ROUND = 3,
+    DEAD = 4,
+    SPECTATING = 5
 }
 
 GameStates = {
-	WAITING_FOR_PLAYERS = 1,
-	BUY_TIME = 2,
-	ROUND = 3,
-	AFTER_ROUND = 4,
-	AFTER_GAME = 5
+    WAITING_FOR_PLAYERS = 1,
+    BUY_TIME = 2,
+    ROUND = 3,
+    AFTER_ROUND = 4,
+    AFTER_GAME = 5
 }
 
 ---------------VARIABLES---------------
@@ -39,20 +39,20 @@ GameStates = {
 Teams = {}
 
 local function setupTeam(team, name)
-	return {
-		name = team.NAME,
-		shortName = name,
-		msgColor = team.COLOR,
-		models = team.MODELS,
-		score = 0,
-		wonLast = false,
-		winRow = 0,
-		players = { },
-		numPlayers = 0,
-		spawnPoints = team.SPAWN_POINTS,
-		spawnArea = team.SPAWN_AREA,
-		spawnDir = team.SPAWN_DIR
-	}
+    return {
+        name = team.NAME,
+        shortName = name,
+        msgColor = team.COLOR,
+        models = team.MODELS,
+        score = 0,
+        wonLast = false,
+        winRow = 0,
+        players = { },
+        numPlayers = 0,
+        spawnPoints = team.SPAWN_POINTS,
+        spawnArea = team.SPAWN_AREA,
+        spawnDir = team.SPAWN_DIR
+    }
 end
 
 Teams.none = setupTeam(Settings.TEAMS.NONE, "none")
@@ -60,18 +60,18 @@ Teams.tt = setupTeam(Settings.TEAMS.TT, "tt")
 Teams.ct = setupTeam(Settings.TEAMS.CT, "ct")
 
 Game = {
-	state = GameStates.WAITING_FOR_PLAYERS,
-	roundTime = 0.0,
-	roundBuyShopTime = 0.0,
-	weaponPickups = {},
-	healthPickups = {},
-	buyWeaponPickups = {},
-	buyMenuPages = {},
-	skipTeamReq = false,
-	pauseGame = false,
+    state = GameStates.WAITING_FOR_PLAYERS,
+    roundTime = 0.0,
+    roundBuyShopTime = 0.0,
+    weaponPickups = {},
+    healthPickups = {},
+    buyWeaponPickups = {},
+    buyMenuPages = {},
+    skipTeamReq = false,
+    pauseGame = false,
 
-	-- stubs
-	init = function ()
+    -- stubs
+    init = function ()
     end,
 
     update = function ()
