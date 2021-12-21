@@ -61,6 +61,7 @@ local function validateStats()
                     local uid = stats.uid
                     local name = humanGetName(playerId)
                     local msg = string.format("#FF0000You moved %.2f meters in 1 second! Too fast!", uid, dist)
+                    print(string.format("%s moved %.2f meters in 1 second! Too fast!", name, dist))
                     sendClientMessage(playerId, msg)
                     setPlayerPos(playerId, lastPos)
 
@@ -68,6 +69,7 @@ local function validateStats()
 
                     if stats.warnPoints > MAX_WARNS then
                         local msg = string.format("#FF0000%s (%s) has been banned due to suspicious behavior!", name, uid)
+                        print(msg)
                         sendClientMessageToAll(msg)
                         clearPlayer(playerId)
                         humanKick(playerId, "You have been banned for suspicious behavior!")
