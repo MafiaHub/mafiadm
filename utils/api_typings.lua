@@ -176,9 +176,30 @@ function weaponDropCreateDefault(weaponId, pos, respawnTime) end
 ---@return number pickupId
 function pickupCreate(pos, modelName) end
 
+---@param pos table
+---@param modelName string
+---@return number pickupId
+function pickupCreateStatic(pos, modelName) end
+
+---@param pickupId number
+---@param state boolean
+function pickupSetStatic(pickupId, state) end
+
+---@param pickupId number
+---@return boolean state
+function pickupGetStatic(pickupId) end
+
 ---@param pickupId number
 ---@param radius number
 function pickupSetRadius(pickupId, radius) end
+
+---@param pickupId number
+---@param heading number
+function pickupSetHeading(pickupId, heading) end
+
+---@param pickupId number
+---@return number heading
+function pickupGetHeading(pickupId) end
 
 ---@param pickupId number
 function pickupDestroy(pickupId) end
