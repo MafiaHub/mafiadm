@@ -60,10 +60,7 @@ local function validateStats()
                 if dist > ALLOWED_DIST*humanGetSpeed(playerId) then
                     local uid = stats.uid
                     local name = humanGetName(playerId)
-                    local last = stats.last
-                    local now = CurTime
-                    local diff = now - last
-                    local msg = string.format("#FF0000%s (%s) moved %.2f meters in %.2f seconds !", name, uid, dist, diff)
+                    local msg = string.format("#FF0000%s (%s) moved %.2f meters!", name, uid, dist)
                     sendClientMessageToAll(msg)
                     setPlayerPos(playerId, lastPos)
 
@@ -73,7 +70,7 @@ local function validateStats()
                         local msg = string.format("#FF0000%s (%s) has been banned due to suspicious behavior!", name, uid)
                         sendClientMessageToAll(msg)
                         clearPlayer(playerId)
-                        humanKick(playerId)
+                        humanKick(playerId, "You have been banned for suspicious behavior!")
                         banPlayer(uid)
                     end
 
