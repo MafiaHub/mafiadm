@@ -128,8 +128,8 @@ return {
         if state == GameStates.WAITING_FOR_PLAYERS then
             despawnFlag(Game.ctf.flags.red)
             despawnFlag(Game.ctf.flags.blue)
-            Game.ctf.flags.red.id = pickupCreate(Settings.FLAGS.RED, Settings.FLAG.MODELS.RED)
-            Game.ctf.flags.blue.id = pickupCreate(Settings.FLAGS.BLUE, Settings.FLAG.MODELS.BLUE)
+            Game.ctf.flags.red.id = pickupCreateStatic(Settings.FLAGS.RED, Settings.FLAG.MODELS.RED)
+            Game.ctf.flags.blue.id = pickupCreateStatic(Settings.FLAGS.BLUE, Settings.FLAG.MODELS.BLUE)
         elseif state == GameStates.ROUND then
             for _, player in pairs(Players) do
                 addHudAnnounceMessage(player, string.format("TT %d : CT %d\n%.2fs", Teams.tt.score, Teams.ct.score, WaitTime - CurTime))
