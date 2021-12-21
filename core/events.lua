@@ -72,7 +72,7 @@ function onPlayerConnected(playerId)
     Teams.none[playerId] = player
 
     sendClientMessage(playerId, "#FFFF00 Welcome to MafiaDM")
-    sendClientMessage(playerId, "#FFFF00 Type /help or press H for a list of commands")
+    sendClientMessage(playerId, "#FFFF00 Type /help or press P for a list of commands")
 
     if Settings.TEAMS.AUTOASSIGN == true or not Settings.TEAMS.ENABLED then
         assignPlayerToTeam(player, Teams.none)
@@ -223,7 +223,7 @@ function onPlayerKeyPress(playerId, isDown, key)
                 hudAddMessage(player.id, string.format("Money: $%d", player.money), Helpers.rgbToColor(34, 207, 0))
             elseif (key == VirtualKeys.B) and isDown and Settings.PLAYER_ALLOW_SHOP_IN_ROUND and (GM.roundBuyShopTime > CurTime or Settings.PLAYER_SHOP_IN_ROUND_NOLIMIT) then
                 if not Settings.PLAYER_DISABLE_ECONOMY then
-                    if Helpers.isPointInCuboid(humanGetPos(player.id), player.team.spawnAreaCheck) then
+                    if not Settings.PLAYER_USE_SPAWNPOINTS and Helpers.isPointInCuboid(humanGetPos(player.id), player.team.spawnAreaCheck) then
                         player.isInMainBuyMenu = true
                         sendBuyMenuMessage(player)
                     end
@@ -247,7 +247,7 @@ function onPlayerKeyPress(playerId, isDown, key)
 
     -- extra commands here
     if isDown then
-        if (key == VirtualKeys.H) then
+        if (key == VirtualKeys.P) then
             cmds.help(player)
         end
     end
