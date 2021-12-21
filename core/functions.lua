@@ -438,13 +438,15 @@ function updatePlayers()
 			player.lastPos = curPos
 			player.lastDir = curDir
 
-			local playerWeaponId = inventoryGetCurrentItem(player.id).weaponId
-			if Helpers.tableHasValue(Settings.HEAVY_WEAPONS, playerWeaponId) then
-				humanSetSpeed(player.id, Settings.HEAVY_WEAPONS_RUN_SPEED * Settings.PLAYER_SPEED_MULT)
-			elseif Helpers.tableHasValue(Settings.LIGHT_WEAPONS, playerWeaponId) then
-				humanSetSpeed(player.id, Settings.LIGHT_WEAPONS_RUN_SPEED * Settings.PLAYER_SPEED_MULT)
-			else
-				humanSetSpeed(player.id, Settings.NORMAL_WEAPONS_RUN_SPEED * Settings.PLAYER_SPEED_MULT)
+			if not player.overrideSpeed then
+				local playerWeaponId = inventoryGetCurrentItem(player.id).weaponId
+				if Helpers.tableHasValue(Settings.HEAVY_WEAPONS, playerWeaponId) then
+					humanSetSpeed(player.id, Settings.HEAVY_WEAPONS_RUN_SPEED * Settings.PLAYER_SPEED_MULT)
+				elseif Helpers.tableHasValue(Settings.LIGHT_WEAPONS, playerWeaponId) then
+					humanSetSpeed(player.id, Settings.LIGHT_WEAPONS_RUN_SPEED * Settings.PLAYER_SPEED_MULT)
+				else
+					humanSetSpeed(player.id, Settings.NORMAL_WEAPONS_RUN_SPEED * Settings.PLAYER_SPEED_MULT)
+				end
 			end
 		end
 
