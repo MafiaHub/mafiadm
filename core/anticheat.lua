@@ -60,8 +60,8 @@ local function validateStats()
                 if dist > ALLOWED_DIST*humanGetSpeed(playerId) then
                     local uid = stats.uid
                     local name = humanGetName(playerId)
-                    local msg = string.format("#FF0000%s (%s) moved %.2f meters!", name, uid, dist)
-                    sendClientMessageToAll(msg)
+                    local msg = string.format("#FF0000You moved %.2f meters in 1 second! Too fast!", uid, dist)
+                    sendClientMessage(playerId, msg)
                     setPlayerPos(playerId, lastPos)
 
                     stats.warnPoints = stats.warnPoints + 1
