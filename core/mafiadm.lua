@@ -59,7 +59,7 @@ Teams.none = setupTeam(Settings.TEAMS.NONE, "none")
 Teams.tt = setupTeam(Settings.TEAMS.TT, "tt")
 Teams.ct = setupTeam(Settings.TEAMS.CT, "ct")
 
-Game = {
+GM = {
     state = GameStates.WAITING_FOR_PLAYERS,
     roundTime = 0.0,
     roundBuyShopTime = 0.0,
@@ -102,7 +102,7 @@ Game = {
     end
 }
 
-EmptyGame = nil
+EmptyGM = nil
 
 CurTime = 0.0
 WaitTime = 0.0

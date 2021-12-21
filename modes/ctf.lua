@@ -16,10 +16,10 @@ local function despawnFlag(flag)
 end
 
 local function getFlagByID(pickupId)
-    if pickupId == Game.ctf.flags.red.id then
-        return Game.ctf.flags.red
-    elseif pickupId == Game.ctf.flags.blue.id then
-        return Game.ctf.flags.blue
+    if pickupId == GM.ctf.flags.red.id then
+        return GM.ctf.flags.red
+    elseif pickupId == GM.ctf.flags.blue.id then
+        return GM.ctf.flags.blue
     else
         return {
             id = 0,
@@ -63,7 +63,7 @@ local function pickupFlag(player, pickupId)
             and CurTime > player.timeToPickupFlag then
                 print(humanGetName(player.id) .. " captured the flag!")
                 sendClientMessageToAllTeam(player.team, string.format("%s captured the flag!", humanGetName(player.id)))
-                pickupAttachTo(pickupId, player.id, Game.ctf.offset)
+                pickupAttachTo(pickupId, player.id, GM.ctf.offset)
                 flag.player = player
                 flag.isTaken = true
                 player.hasFlag = true
@@ -118,26 +118,26 @@ return {
     end,
 
     update = function ()
-        if Game.state == GameStates.WAITING_FOR_PLAYERS then
-            despawnFlag(Game.ctf.flags.red)
-            despawnFlag(Game.ctf.flags.blue)
+        if GM.state == GameStates.WAITING_FOR_PLAYERS then
+            despawnFlag(GM.ctf.flags.red)
+            despawnFlag(GM.ctf.flags.blue)
         end
     end,
 
     updateGameState = function (state)
         if state == GameStates.WAITING_FOR_PLAYERS then
-            despawnFlag(Game.ctf.flags.red)
-            despawnFlag(Game.ctf.flags.blue)
-            Game.ctf.flags.red.id = pickupCreateStatic(Settings.FLAGS.RED, Settings.FLAG.MODELS.RED)
-            Game.ctf.flags.blue.id = pickupCreateStatic(Settings.FLAGS.BLUE, Settings.FLAG.MODELS.BLUE)
+            despawnFlag(GM.ctf.flags.red)
+            despawnFlag(GM.ctf.flags.blue)
+            GM.ctf.flags.red.id = pickupCreateStatic(Settings.FLAGS.RED, Settings.FLAG.MODELS.RED)
+            GM.ctf.flags.blue.id = pickupCreateStatic(Settings.FLAGS.BLUE, Settings.FLAG.MODELS.BLUE)
         elseif state == GameStates.ROUND then
             for _, player in pairs(Players) do
                 addHudAnnounceMessage(player, string.format("TT %d : CT %d\n%.2fs", Teams.tt.score, Teams.ct.score, WaitTime - CurTime))
             end
         elseif state == GameStates.AFTER_GAME then
             if WaitTime < CurTime then
-                despawnFlag(Game.ctf.flags.red)
-                despawnFlag(Game.ctf.flags.blue)
+                despawnFlag(GM.ctf.flags.red)
+                despawnFlag(GM.ctf.flags.blue)
                 clearPlayersInventory()
             end
         end
@@ -172,7 +172,7 @@ return {
     end,
 
     diePlayer = function (player)
-        if Game.state == GameStates.ROUND then
+        if GM.state == GameStates.ROUND then
             dropFlag(player)
         end
     end

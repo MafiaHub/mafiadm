@@ -46,7 +46,7 @@ return {
     end,
 
     diePlayer = function (player, inflictor)
-        if Game.state == GameStates.ROUND and inflictor then
+        if GM.state == GameStates.ROUND and inflictor then
             inflictor.score = inflictor.score + 1
         end
     end

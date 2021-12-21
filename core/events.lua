@@ -1,9 +1,9 @@
 ---@diagnostic disable-next-line: lowercase-global
 function onTick()
-    if not Game.pauseGame then
+    if not GM.pauseGame then
         CurTime = getTime() * 0.001
         updateGame()
-        Game.update()
+        GM.update()
         updatePlayers()
         zac.validateStats()
     end
@@ -24,15 +24,15 @@ function onScriptStart()
         Teams.none.models = Settings.TEAMS.NONE.MODELS
     end
 
-    EmptyGame = Helpers.deepCopy(Game)
+    EmptyGM = Helpers.deepCopy(GM)
     startGame()
-    Game.init()
+    GM.init()
     print("MafiaDM was initialised!\n")
 end
 
 ---@diagnostic disable-next-line: lowercase-global
 function onPlayerWeaponDrop(playerId, pickupId)
-    table.insert(Game.weaponPickups, pickupId)
+    table.insert(GM.weaponPickups, pickupId)
     return true
 end
 
@@ -67,7 +67,7 @@ function onPlayerConnected(playerId)
         timeToBuyWeaponWithKey = 0.0,
     }
 
-    player = Helpers.tableAssign(player, Game.initPlayer())
+    player = Helpers.tableAssign(player, GM.initPlayer())
     Players[playerId] = player
     Teams.none[playerId] = player
 
@@ -86,7 +86,7 @@ function onPlayerConnected(playerId)
         cameraInterpolate(playerId, Settings.WELCOME_CAMERA.START.POS, Settings.WELCOME_CAMERA.START.ROT, Settings.WELCOME_CAMERA.STOP.POS, Settings.WELCOME_CAMERA.STOP.ROT, Settings.WELCOME_CAMERA.TIME)
     end
 
-    if Game.state == GameStates.WAITING_FOR_PLAYERS then
+    if GM.state == GameStates.WAITING_FOR_PLAYERS then
         local numPlayers = Helpers.tableCountFields(Players)
 
         if numPlayers < Settings.MIN_PLAYER_AMOUNT_PER_TEAM*2 then
@@ -119,7 +119,7 @@ end
 function onPlayerHit(playerId, inflictorId, damage, hitType, bodyPart)
     print("damage " .. tostring(damage))
 
-    if Game.state == GameStates.BUY_TIME then
+    if GM.state == GameStates.BUY_TIME then
         return 0
     end
 
@@ -165,7 +165,7 @@ function onPlayerInsidePickupRadius(playerId, pickupId)
         return
     end
 
-    for _, healthPickup in ipairs(Game.healthPickups) do
+    for _, healthPickup in ipairs(GM.healthPickups) do
         if healthPickup.id == pickupId then
             local player = Players[playerId]
 
@@ -180,7 +180,7 @@ function onPlayerInsidePickupRadius(playerId, pickupId)
         end
     end
 
-    for _, buyWeaponPickup in ipairs(Game.buyWeaponPickups) do
+    for _, buyWeaponPickup in ipairs(GM.buyWeaponPickups) do
         if buyWeaponPickup.id == pickupId then
             local weapon = findWeaponInfoInSettings(buyWeaponPickup.wepId)
             if player.holdsBuyWeaponKey and player.timeToBuyWeaponWithKey < CurTime then
@@ -194,7 +194,7 @@ function onPlayerInsidePickupRadius(playerId, pickupId)
         end
     end
 
-    Game.onPlayerInsidePickupRadius(playerId, pickupId)
+    GM.onPlayerInsidePickupRadius(playerId, pickupId)
 end
 
 ---@diagnostic disable-next-line: lowercase-global
@@ -213,15 +213,15 @@ function onPlayerKeyPress(playerId, isDown, key)
                 autoAssignPlayerToTeam(player)
             end
         end
-    elseif Game.state == GameStates.BUY_TIME then
+    elseif GM.state == GameStates.BUY_TIME then
         handleBuyMenuRequest(player, key, isDown)
-    elseif Game.state == GameStates.ROUND then
+    elseif GM.state == GameStates.ROUND then
         if player.state == PlayerStates.IN_ROUND then
             if (key == VirtualKeys.Menu) then
                 player.holdsBuyWeaponKey = isDown
             elseif (key == VirtualKeys.M) and isDown then
                 hudAddMessage(player.id, string.format("Money: $%d", player.money), Helpers.rgbToColor(34, 207, 0))
-            elseif (key == VirtualKeys.B) and isDown and Settings.PLAYER_ALLOW_SHOP_IN_ROUND and (Game.roundBuyShopTime > CurTime or Settings.PLAYER_SHOP_IN_ROUND_NOLIMIT) then
+            elseif (key == VirtualKeys.B) and isDown and Settings.PLAYER_ALLOW_SHOP_IN_ROUND and (GM.roundBuyShopTime > CurTime or Settings.PLAYER_SHOP_IN_ROUND_NOLIMIT) then
                 if not Settings.PLAYER_DISABLE_ECONOMY then
                     if Helpers.isPointInCuboid(humanGetPos(player.id), player.team.spawnAreaCheck) then
                         player.isInMainBuyMenu = true
@@ -252,7 +252,7 @@ function onPlayerKeyPress(playerId, isDown, key)
         end
     end
 
-    Game.onPlayerKeyPress(player, isDown, key)
+    GM.onPlayerKeyPress(player, isDown, key)
 end
 
 ---@diagnostic disable-next-line: lowercase-global

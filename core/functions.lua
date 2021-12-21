@@ -2,7 +2,7 @@
 
 function InitMode(mode)
     print("\nLoading mode: " .. mode)
-    Game = Helpers.tableAssignDeep(Game, require("modes/" .. mode))
+    GM = Helpers.tableAssignDeep(GM, require("modes/" .. mode))
 end
 
 function inTeamColor(team, text)
@@ -120,7 +120,7 @@ function advance.simple(team)
     team.score = team.score + 1
 
     if team.score >= Settings.MAX_TEAM_SCORE then
-        Game.state = GameStates.AFTER_GAME
+        GM.state = GameStates.AFTER_GAME
         WaitTime = Settings.WAIT_TIME.END_GAME + CurTime
 
         sendClientMessageToAll(team:inTeamColor() .. " win!")
@@ -169,10 +169,10 @@ function advance.round(team, moneyProc)
     end
 
     if team.score >= Settings.MAX_TEAM_SCORE then
-        Game.state = GameStates.AFTER_GAME
+        GM.state = GameStates.AFTER_GAME
         WaitTime = Settings.WAIT_TIME.END_GAME + CurTime
     else
-        Game.state = GameStates.AFTER_ROUND
+        GM.state = GameStates.AFTER_ROUND
         WaitTime = Settings.WAIT_TIME.END_ROUND + CurTime
     end
 end
@@ -242,7 +242,7 @@ function assignPlayerToTeam(player, team)
         sendClientMessage(player.id, "You are assigned to team " .. team:inTeamColor() .. "!")
     end
 
-    if Game.state ~= GameStates.WAITING_FOR_PLAYERS and not Settings.PLAYER_HOTJOIN then
+    if GM.state ~= GameStates.WAITING_FOR_PLAYERS and not Settings.PLAYER_HOTJOIN then
         spectate(player, 1)
     end
 end
@@ -334,14 +334,14 @@ function prepareBuyMenu()
         end
     end
 
-    Game.buyMenuPages = pages
+    GM.buyMenuPages = pages
 end
 
 function clearUpPickups()
-    for _, pickupId in ipairs(Game.weaponPickups) do
+    for _, pickupId in ipairs(GM.weaponPickups) do
         pickupDestroy(pickupId)
     end
-    Game.weaponPickups = {}
+    GM.weaponPickups = {}
 end
 
 function sendBuyMenuMessage(player)
@@ -360,7 +360,7 @@ function sendBuyMenuMessage(player)
     if player.isInMainBuyMenu then
         for _, pageName in ipairs(Settings.PAGES_ORDER) do
             sendClientMessage(player.id, string.format("%d: %s", key, pageName))
-            player.buyMenuPage[key] = Game.buyMenuPages[pageName]
+            player.buyMenuPage[key] = GM.buyMenuPages[pageName]
             key = key + 1
         end
     else
@@ -450,7 +450,7 @@ function updatePlayers()
             end
         end
 
-        Game.updatePlayer(player)
+        GM.updatePlayer(player)
 
         if player.hudAnnounceMessage then
             hudAnnounce(player.id, player.hudAnnounceMessage, 1)
@@ -474,7 +474,7 @@ function buyWeapon(player, weapon)
         if player.money >= weapon.cost then
             local bought = false
             if weapon.special then
-                bought = Game.handleSpecialBuy(player, weapon)
+                bought = GM.handleSpecialBuy(player, weapon)
             else
                 if inventoryAddWeaponDefault(player.id, weapon.weaponId) then
                     player.money = player.money - weapon.cost
@@ -497,7 +497,7 @@ function startGame()
     if Settings.HEALTH_PICKUPS then
         for _, pickupPos in ipairs(Settings.HEALTH_PICKUPS) do
             local healthPickupId = pickupCreate(pickupPos, Settings.HEALTH_PICKUP.MODEL)
-            table.insert(Game.healthPickups, {
+            table.insert(GM.healthPickups, {
                 id = healthPickupId,
                 pos = pickupPos,
                 time = 0.0
@@ -508,14 +508,14 @@ function startGame()
     if Settings.WEAPON_PICKUPS then
         for _, pickup in ipairs(Settings.WEAPON_PICKUPS) do
             local pickupId = weaponDropCreateDefault(pickup[2], pickup[1], Settings.WEAPON_PICKUP.RESPAWN_TIME)
-            table.insert(Game.weaponPickups, pickupId)
+            table.insert(GM.weaponPickups, pickupId)
         end
     end
 
     if Settings.BUY_WEAPON_PICKUPS then
         for _, pickup in ipairs(Settings.BUY_WEAPON_PICKUPS) do
             local pickupId = pickupCreate(pickup[1], findWeaponInfoInSettings(pickup[2]).model)
-            table.insert(Game.buyWeaponPickups, {
+            table.insert(GM.buyWeaponPickups, {
                 id = pickupId,
                 wepId = pickup[2],
             })
@@ -563,7 +563,7 @@ function handleDyingOrDisconnect(playerId, inflictorId, damage, hitType, bodyPar
         end
     end
 
-    Game.diePlayer(player, inflictor, damage, hitType, bodyPart, disconnected)
+    GM.diePlayer(player, inflictor, damage, hitType, bodyPart, disconnected)
 
     if Settings.PLAYER_RESPAWN_AFTER_DEATH then
         player.deadTime = CurTime + Settings.WAIT_TIME.AFTER_DEATH_RESPAWN
@@ -574,7 +574,7 @@ function handleDyingOrDisconnect(playerId, inflictorId, damage, hitType, bodyPar
         if weaponId > 1 and inventoryRemoveWeapon(playerId, weaponId) then
             local pos = Helpers.addRandomVectorOffset(humanGetPos(player.id), {1.0, 0.0, 1.0})
             local pickupId = weaponDropCreate(weaponId, pos, 2147483647, item.ammoLoaded, item.ammoHidden)
-            table.insert(Game.weaponPickups, pickupId)
+            table.insert(GM.weaponPickups, pickupId)
         end
     end
 
@@ -653,10 +653,10 @@ local function autobalancePlayers()
 end
 
 function updateGame()
-    if Game.state == GameStates.WAITING_FOR_PLAYERS then
+    if GM.state == GameStates.WAITING_FOR_PLAYERS then
         if (Teams.tt.numPlayers >= Settings.MIN_PLAYER_AMOUNT_PER_TEAM and Teams.ct.numPlayers >= Settings.MIN_PLAYER_AMOUNT_PER_TEAM)
-            or Game.skipTeamReq then
-            Game.skipTeamReq = false
+            or GM.skipTeamReq then
+            GM.skipTeamReq = false
 
             autobalancePlayers()
 
@@ -671,13 +671,13 @@ function updateGame()
                 end
             end
 
-            if not Game.updateGameState(Game.state) then
+            if not GM.updateGameState(GM.state) then
                 if Settings.PLAYER_DISABLE_ECONOMY or Settings.PLAYER_DISABLE_SHOP then
-                    Game.state = GameStates.ROUND
+                    GM.state = GameStates.ROUND
                     WaitTime = Settings.WAIT_TIME.ROUND + CurTime
-                    Game.roundBuyShopTime = CurTime + Settings.WAIT_TIME.SHOP_CLOSE
+                    GM.roundBuyShopTime = CurTime + Settings.WAIT_TIME.SHOP_CLOSE
                 else
-                    Game.state = GameStates.BUY_TIME
+                    GM.state = GameStates.BUY_TIME
                     WaitTime = Settings.WAIT_TIME.BUYING + CurTime
                 end
             end
@@ -690,7 +690,7 @@ function updateGame()
                 end
             end
         end
-    elseif Game.state == GameStates.BUY_TIME then
+    elseif GM.state == GameStates.BUY_TIME then
         for _, player in pairs(Players) do
             addHudAnnounceMessage(player, string.format("Buy time - %.2fs", WaitTime - CurTime))
 
@@ -707,20 +707,20 @@ function updateGame()
                 player.buyMenuPage = nil
             end
 
-            if not Game.updateGameState(Game.state) then
-                Game.state = GameStates.ROUND
+            if not GM.updateGameState(GM.state) then
+                GM.state = GameStates.ROUND
                 WaitTime = Settings.WAIT_TIME.ROUND + CurTime
-                Game.roundBuyShopTime = CurTime + Settings.WAIT_TIME.SHOP_CLOSE
+                GM.roundBuyShopTime = CurTime + Settings.WAIT_TIME.SHOP_CLOSE
             end
         end
-    elseif Game.state == GameStates.ROUND then
-        for _, healthPickup in ipairs(Game.healthPickups) do
+    elseif GM.state == GameStates.ROUND then
+        for _, healthPickup in ipairs(GM.healthPickups) do
             if healthPickup.id == nil and healthPickup.time < CurTime then
                 healthPickup.id = pickupCreate(healthPickup.pos, Settings.HEALTH_PICKUP.MODEL)
             end
         end
 
-        Game.updateGameState(Game.state)
+        GM.updateGameState(GM.state)
 
         if Settings.PLAYER_RESPAWN_AFTER_DEATH then
             for _, player in pairs(Players) do
@@ -732,14 +732,14 @@ function updateGame()
             end
         end
 
-        if (Game.roundBuyShopTime > CurTime or Settings.PLAYER_SHOP_IN_ROUND_NOLIMIT) and not Settings.PLAYER_USE_SPAWNPOINTS then
+        if (GM.roundBuyShopTime > CurTime or Settings.PLAYER_SHOP_IN_ROUND_NOLIMIT) and not Settings.PLAYER_USE_SPAWNPOINTS then
             for _, player in pairs(Players) do
                 if player.state == PlayerStates.IN_ROUND then
                     if Helpers.isPointInCuboid(humanGetPos(player.id), player.team.spawnAreaCheck) then
                         if Settings.PLAYER_SHOP_IN_ROUND_NOLIMIT then
                             addHudAnnounceMessage(player, "Buy zone")
                         else
-                            addHudAnnounceMessage(player, string.format("Buy zone - %.2fs", Game.roundBuyShopTime - CurTime))
+                            addHudAnnounceMessage(player, string.format("Buy zone - %.2fs", GM.roundBuyShopTime - CurTime))
                         end
                     end
                 end
@@ -766,11 +766,11 @@ function updateGame()
                     sendClientMessageToAll(string.format("%s %d : %d %s", Teams.tt:inTeamColor(), Teams.tt.score, Teams.ct.score, Teams.ct:inTeamColor()))
                 end
 
-                Game.state = GameStates.AFTER_GAME
+                GM.state = GameStates.AFTER_GAME
                 WaitTime = Settings.WAIT_TIME.END_GAME + CurTime
             end
         end
-    elseif Game.state == GameStates.AFTER_ROUND then
+    elseif GM.state == GameStates.AFTER_ROUND then
         if WaitTime > CurTime then
             for _, player in pairs(Players) do
                 addHudAnnounceMessage(player, string.format("Next round in %.2fs!", WaitTime - CurTime))
@@ -778,12 +778,12 @@ function updateGame()
         else
             clearUpPickups()
 
-            if not Game.updateGameState(Game.state) then
-                Game.state = GameStates.WAITING_FOR_PLAYERS
+            if not GM.updateGameState(GM.state) then
+                GM.state = GameStates.WAITING_FOR_PLAYERS
                 WaitTime = Settings.WAIT_TIME.BUYING + CurTime
             end
         end
-    elseif Game.state == GameStates.AFTER_GAME then
+    elseif GM.state == GameStates.AFTER_GAME then
         if WaitTime > CurTime then
             for _, player in pairs(Players) do
                 if Teams.tt.score == Teams.ct.score then
@@ -793,7 +793,7 @@ function updateGame()
                 end
             end
         else
-            Game.updateGameState(Game.state)
+            GM.updateGameState(GM.state)
 
             Teams.tt.score = 0
             Teams.tt.winRow = 0
@@ -816,8 +816,8 @@ function updateGame()
                 sendSelectTeamMessage(player)
             end
 
-            Game = Helpers.deepCopy(EmptyGame)
-            Game.state = GameStates.WAITING_FOR_PLAYERS
+            GM = Helpers.deepCopy(EmptyGM)
+            GM.state = GameStates.WAITING_FOR_PLAYERS
 
             startGame()
         end

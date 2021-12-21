@@ -21,7 +21,7 @@ return {
     end,
 
     diePlayer = function (player)
-        if Game.state == GameStates.ROUND then
+        if GM.state == GameStates.ROUND then
             advance.simple(getOppositeTeam(player.team))
         end
     end

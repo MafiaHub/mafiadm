@@ -30,7 +30,7 @@ end
 
 function cmds.skip(player, ...)
     if zac.isAdmin(player.uid) then
-        Game.skipTeamReq = true
+        GM.skipTeamReq = true
     end
 end
 
@@ -64,7 +64,7 @@ end
 
 function cmds.p(player)
     if zac.isAdmin(player.uid) then
-        Game.pauseGame = not Game.pauseGame
+        GM.pauseGame = not GM.pauseGame
     end
 end
 

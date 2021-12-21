@@ -40,7 +40,7 @@ return {
     end,
 
     diePlayer = function (player)
-        if Game.state == GameStates.ROUND then
+        if GM.state == GameStates.ROUND then
             local deadPlayersCount = 0
             for _, player in pairs(player.team.players) do
                 if player.state == PlayerStates.DEAD or player.state == PlayerStates.SPECTATING then
@@ -49,7 +49,7 @@ return {
             end
 
             if deadPlayersCount == player.team.numPlayers then
-                if player.team == Teams.tt and Game.bomb.plantTime ~= 0 then
+                if player.team == Teams.tt and GM.bomb.plantTime ~= 0 then
                     --brain farted, dunno
                 else
                     print("win cause of enemy team dead")
