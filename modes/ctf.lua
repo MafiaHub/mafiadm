@@ -138,6 +138,7 @@ return {
             if WaitTime < CurTime then
                 despawnFlag(Game.ctf.flags.red)
                 despawnFlag(Game.ctf.flags.blue)
+                clearPlayersInventory()
             end
         end
 

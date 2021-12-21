@@ -187,6 +187,12 @@ function findPlayerWithUID(uid)
 	return nil
 end
 
+function clearPlayersInventory()
+	for _, player in pairs(Players) do
+		inventoryTruncateWeapons(player.id)
+	end
+end
+
 function addPlayerMoney(player, money, msg, color)
 	if Settings.PLAYER_DISABLE_ECONOMY then
 		return
@@ -291,7 +297,11 @@ function spawnOrTeleportPlayer(player, optionalSpawnPos, optionalSpawnDir, optio
 		humanSpawn(player.id)
 
 		if not player.isSpawned or player.state == PlayerStates.DEAD then
-			inventoryAddWeaponDefault(player.id, 6) -- Colt Detective Special -- IDEA add default weapons option to game_settings?
+			if Settings.SPAWN_WEAPONS then
+				for _, weaponId in ipairs(Settings.SPAWN_WEAPONS) do
+					inventoryAddWeaponDefault(player.id, weaponId)
+				end
+			end
 		end
 
 		player.isSpawned = true

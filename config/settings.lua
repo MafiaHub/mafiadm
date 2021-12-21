@@ -89,6 +89,9 @@ local settings = {
             NO_KIT = 10.0
         }
     },
+    SPAWN_WEAPONS = {
+        6, -- Colt Detective Special
+    },
     MIN_PLAYER_AMOUNT_PER_TEAM = 5,
     PLAYER_DISABLE_ECONOMY = false,
     PLAYER_DISABLE_SHOP = false,
