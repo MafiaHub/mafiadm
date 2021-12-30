@@ -49,5 +49,10 @@ return {
         if GM.state == GameStates.ROUND and inflictor then
             inflictor.score = inflictor.score + 1
         end
+    end,
+
+    showObjectives = function (player)
+        addHudAnnounceMessage(player, "Objectives:")
+        addHudAnnounceMessage(player, "Kill everyone, no matter what team they're on!")
     end
 }

@@ -175,5 +175,12 @@ return {
         if GM.state == GameStates.ROUND then
             dropFlag(player)
         end
+    end,
+
+    showObjectives = function (player)
+        addHudAnnounceMessage(player, "Objectives:")
+        addHudAnnounceMessage(player, "Steal the flag of the other team and deliver it back to your base!")
+        addHudAnnounceMessage(player, "If your flag was stolen, kill the flag bearer and return the flag back!")
+        addHudAnnounceMessage(player, string.format("Reach score of %d with your team by capturing flags to win the game!", Settings.MAX_TEAM_SCORE))
     end
 }

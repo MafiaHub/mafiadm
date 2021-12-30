@@ -24,5 +24,10 @@ return {
         if GM.state == GameStates.ROUND then
             advance.simple(getOppositeTeam(player.team))
         end
+    end,
+
+    showObjectives = function (player)
+        addHudAnnounceMessage(player, "Objectives:")
+        addHudAnnounceMessage(player, string.format("Reach score of %d with your team by the time limit. Team with the most score wins if time is up!", Settings.MAX_TEAM_SCORE))
     end
 }

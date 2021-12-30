@@ -360,5 +360,12 @@ return {
         end
 
         spectate(player, 1)
+    end,
+
+    showObjectives = function (player)
+        addHudAnnounceMessage(player, "Objectives:")
+        addHudAnnounceMessage(player, "As a gangster, you must place a bomb on a designated bomb site and defend it.")
+        addHudAnnounceMessage(player, "As a cop, you must defuse the bomb and eliminate the opposing team.")
+        addHudAnnounceMessage(player, string.format("Reach score of %d with your team to win the game!", Settings.MAX_TEAM_SCORE))
     end
 }

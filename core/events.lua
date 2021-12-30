@@ -98,6 +98,8 @@ function onPlayerConnected(playerId)
         end
         spawnPlayer(player)
     end
+
+    GM.showObjectives(player)
 end
 
 ---@diagnostic disable-next-line: lowercase-global
@@ -249,6 +251,8 @@ function onPlayerKeyPress(playerId, isDown, key)
     if isDown then
         if (key == VirtualKeys.P) then
             cmds.help(player)
+        elseif (key == VirtualKeys.Tab) then
+            GM.showObjectives(player)
         end
     end
 

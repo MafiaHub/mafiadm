@@ -59,5 +59,11 @@ return {
         end
 
         spectate(player, 1)
+    end,
+
+    showObjectives = function (player)
+        addHudAnnounceMessage(player, "Objectives:")
+        addHudAnnounceMessage(player, "Eliminate the opposing team each round.")
+        addHudAnnounceMessage(player, string.format("Reach score of %d with your team by surviving each round to win the game!", Settings.MAX_TEAM_SCORE))
     end
 }

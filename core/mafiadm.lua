@@ -99,6 +99,11 @@ GM = {
     end,
 
     diePlayer = function (player, inflictor, damage, hitType, bodyPart, disconnected)
+    end,
+
+    showObjectives = function (player)
+        addHudAnnounceMessage(player, "Objectives:")
+        addHudAnnounceMessage(player, "None!")
     end
 }
 
