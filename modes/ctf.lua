@@ -42,7 +42,7 @@ local function dropFlag(player)
 		local pos = Helpers.addRandomVectorOffset(humanGetPos(player.id), {1.0, 0, 1.0})
 		pickupDetach(player.flag.id)
 		pickupSetPos(player.flag.id, pos)
-        pickupSetStatic(player.flag.id, true)
+        pickupSetStatic(player.flag.id, false)
         sendClientMessageToAllTeam(player.flag.team, string.format("%s dropped the flag!", humanGetName(player.id)))
 
 		player.flag.player = nil
@@ -65,7 +65,7 @@ local function pickupFlag(player, pickupId)
                 print(humanGetName(player.id) .. " captured the flag!")
                 sendClientMessageToAllTeam(player.team, string.format("%s captured the flag!", humanGetName(player.id)))
                 pickupAttachTo(pickupId, player.id, GM.ctf.offset)
-                pickupSetStatic(pickupId, true)
+                pickupSetStatic(pickupId, false)
                 flag.player = player
                 flag.isTaken = true
                 player.hasFlag = true
