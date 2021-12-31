@@ -24,7 +24,7 @@ return {
     },
     WELCOME_CAMERA = {
         START = {
-            POS = {35.550987, 13.431483, -19.186592},
+            POS = {35.550987, 2.431483, -19.186592},
             ROT = {-0.707612, -0.075936, 0.706601, 0.000000},
         },
         STOP = {
@@ -34,4 +34,5 @@ return {
         TIME = 80000,
     },
     MAX_TEAM_SCORE = 16,
+    MIN_PLAYER_AMOUNT_PER_TEAM = 1
 }

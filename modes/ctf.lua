@@ -32,7 +32,7 @@ local function resetFlag(flag)
     local flagModel = compareTeams(flag.team, Teams.tt) and Settings.FLAG.MODELS.RED or Settings.FLAG.MODELS.BLUE
     despawnFlag(flag)
 
-    flag.id = pickupCreate(flagPos, flagModel)
+    flag.id = pickupCreateStatic(flagPos, flagModel)
 end
 
 local function dropFlag(player)
@@ -42,6 +42,7 @@ local function dropFlag(player)
 		local pos = Helpers.addRandomVectorOffset(humanGetPos(player.id), {1.0, 0, 1.0})
 		pickupDetach(player.flag.id)
 		pickupSetPos(player.flag.id, pos)
+        pickupSetStatic(player.flag.id, true)
         sendClientMessageToAllTeam(player.flag.team, string.format("%s dropped the flag!", humanGetName(player.id)))
 
 		player.flag.player = nil
@@ -64,6 +65,7 @@ local function pickupFlag(player, pickupId)
                 print(humanGetName(player.id) .. " captured the flag!")
                 sendClientMessageToAllTeam(player.team, string.format("%s captured the flag!", humanGetName(player.id)))
                 pickupAttachTo(pickupId, player.id, GM.ctf.offset)
+                pickupSetStatic(pickupId, true)
                 flag.player = player
                 flag.isTaken = true
                 player.hasFlag = true
