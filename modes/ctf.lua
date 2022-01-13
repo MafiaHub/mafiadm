@@ -33,6 +33,7 @@ local function resetFlag(flag)
     despawnFlag(flag)
 
     flag.id = pickupCreateStatic(flagPos, flagModel)
+    flag.nextInteractionTime = CurTime + Settings.WAIT_TIME.INTERACT_FLAG
 end
 
 local function dropFlag(player)
@@ -43,6 +44,7 @@ local function dropFlag(player)
 		pickupDetach(player.flag.id)
 		pickupSetPos(player.flag.id, pos)
         pickupSetStatic(player.flag.id, false)
+        player.flag.nextInteractionTime = CurTime + Settings.WAIT_TIME.INTERACT_FLAG
         sendClientMessageToAllTeam(player.flag.team, string.format("%s dropped the flag!", humanGetName(player.id)))
 
 		player.flag.player = nil
@@ -61,6 +63,7 @@ local function pickupFlag(player, pickupId)
             and not player.hasFlag
             and (not flag.isTaken or (flag.isTaken and not flag.player))
             and not compareTeams(player.team, flag.team)
+            and CurTime > flag.nextInteractionTime
             and CurTime > player.timeToPickupFlag then
                 print(humanGetName(player.id) .. " captured the flag!")
                 sendClientMessageToAllTeam(player.team, string.format("%s captured the flag!", humanGetName(player.id)))
@@ -70,8 +73,10 @@ local function pickupFlag(player, pickupId)
                 flag.isTaken = true
                 player.hasFlag = true
                 player.flag = flag
+                flag.nextInteractionTime = CurTime + Settings.WAIT_TIME.INTERACT_FLAG
         elseif player.state == PlayerStates.IN_ROUND
             and flag.isTaken
+            and CurTime > flag.nextInteractionTime
             and compareTeams(player.team, flag.team) then
                 print(humanGetName(player.id) .. " returned the flag!")
                 sendClientMessageToAllTeam(flag.team, string.format("%s has returned the flag!", humanGetName(player.id)))
@@ -90,14 +95,16 @@ return {
                 pos = nil,
                 player = nil,
                 isTaken = false,
-                team = Teams.tt
+                team = Teams.tt,
+                nextInteractionTime = 0.0,
             },
             blue = {
                 id = 0,
                 pos = nil,
                 player = nil,
                 isTaken = false,
-                team = Teams.ct
+                team = Teams.ct,
+                nextInteractionTime = 0.0,
             },
         },
     },

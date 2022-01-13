@@ -78,6 +78,7 @@ local settings = {
         AFK_DROP_BOMB = 15.0,
         PICKUP_BOMB = 5.0,
         PICKUP_FLAG = 5.0,
+        INTERACT_FLAG = 2.5,
         BUYING = 30.0,
         BUY_PICKUP_WEAPON = 3.0,
         END_ROUND = 10.0,
