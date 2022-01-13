@@ -10,7 +10,7 @@ local admins = require("config/admins")
 local ALLOWED_DIST = 6.0
 local NEXT_CHECK = 1.0
 local WARN_RESET = 80.0
-local MAX_WARNS = 10
+local MAX_WARNS = 999
 local lastCheck = 0.0
 
 local function isAdmin(uid)
