@@ -569,6 +569,10 @@ function handleDyingOrDisconnect(playerId, inflictorId, damage, hitType, bodyPar
         player.deadTime = CurTime + Settings.WAIT_TIME.AFTER_DEATH_RESPAWN
     end
 
+    if Settings.MONEY_ON_DEATH ~= 0 then
+        addPlayerMoney(player, Settings.MONEY_ON_DEATH, "You died so here's some money")
+    end
+
     for _, item in pairs(inventory) do
         local weaponId = item.weaponId
         local drop = true
