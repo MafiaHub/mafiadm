@@ -46,6 +46,10 @@ local function banPlayer(uid)
     table.insert(bannedPlayers, uid)
 end
 
+local function unbanPlayer(uid)
+    table.remove(bannedPlayers, uid)
+end
+
 local function isPlayerBanned(uid)
     return Helpers.tableHasValue(bannedPlayers, uid)
 end
@@ -116,6 +120,7 @@ return {
     setPlayerPos = setPlayerPos,
     validateStats = validateStats,
     banPlayer = banPlayer,
+    unbanPlayer = unbanPlayer,
     isPlayerBanned = isPlayerBanned,
     isAdmin = isAdmin,
     reloadLists = reloadLists,

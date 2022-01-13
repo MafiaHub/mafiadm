@@ -81,6 +81,18 @@ function cmds.ban(player, ...)
     end
 end
 
+function cmds.unban(player, ...)
+    if zac.isAdmin(player.uid) then
+        local arg = {...}
+        if #arg > 0 then
+            local playerId = tonumber(arg[1])
+            if playerId then
+                zac.unbanPlayer(humanGetUID(playerId))
+            end
+        end
+    end
+end
+
 function cmds.banid(player, ...)
     if zac.isAdmin(player.uid) then
         local arg = {...}
