@@ -571,7 +571,16 @@ function handleDyingOrDisconnect(playerId, inflictorId, damage, hitType, bodyPar
 
     for _, item in pairs(inventory) do
         local weaponId = item.weaponId
-        if weaponId > 1 and inventoryRemoveWeapon(playerId, weaponId) then
+        local drop = true
+        if Settings.SPAWN_WEAPONS then
+            for _, spawnWeapon in ipairs(Settings.SPAWN_WEAPONS) do
+                if spawnWeapon == weaponId then
+                    drop = false
+                    break
+                end
+            end
+        end
+        if drop and weaponId > 1 and inventoryRemoveWeapon(playerId, weaponId) then
             local pos = Helpers.addRandomVectorOffset(humanGetPos(player.id), {1.0, 0.0, 1.0})
             local pickupId = weaponDropCreate(weaponId, pos, 2147483647, item.ammoLoaded, item.ammoHidden)
             table.insert(GM.weaponPickups, pickupId)
