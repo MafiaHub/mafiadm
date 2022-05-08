@@ -19,6 +19,10 @@ return {
         -- Disable teams
         Settings.TEAMS.ENABLED = false
 
+        -- Enable friendly fire
+        Settings.FRIENDLY_FIRE.ENABLED = true
+        Settings.FRIENDLY_FIRE.DAMAGE_MULTIPLIER = 1.0
+
         -- Use spawnpoints
         Settings.PLAYER_USE_SPAWNPOINTS = true
 

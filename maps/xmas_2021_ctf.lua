@@ -2,7 +2,7 @@ return {
     MISSION = "XMAS_2021_CTF",
     MODE = Modes.CTF,
     TEAMS = {
-        AUTOASSIGN = true,
+        AUTOASSIGN = false,
         TT = {
             SPAWN_AREA = { {-56.221218, -4.096076, -19.344057}, {-61.312107, -4.096076, -22.260204} },
             SPAWN_DIR = { 0.900399, 0.000000, 0.435065 }
@@ -31,8 +31,8 @@ return {
             POS = {2.432493, 2.188061, 43.747379},
             ROT = {-0.489713, -0.295208, 0.871884, 0.000000},
         },
-        TIME = 80000,
+        TIME = 5000,
     },
-    MAX_TEAM_SCORE = 16,
+    MAX_TEAM_SCORE = 5,
     MIN_PLAYER_AMOUNT_PER_TEAM = 1
 }

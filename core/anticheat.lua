@@ -7,7 +7,7 @@ local bannedPlayers = require("config/bans")
 -- List of admins
 local admins = require("config/admins")
 
-local ALLOWED_DIST = 6.0
+local ALLOWED_DIST = 7.5
 local NEXT_CHECK = 1.0
 local WARN_RESET = 80.0
 local MAX_WARNS = 999

@@ -1,4 +1,4 @@
 -- SET TO DESIRED MAP NAME
-MAPNAME = "xmas_2021_ctf"
+MAPNAME = "ffa_test"
 
 require("core/mafiadm")

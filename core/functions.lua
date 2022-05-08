@@ -295,6 +295,7 @@ function spawnOrTeleportPlayer(player, optionalSpawnPos, optionalSpawnDir, optio
         humanDespawn(player.id)
         humanSetModel(player.id, optionalModel or Helpers.randomTableElem(player.team.models))
         humanSpawn(player.id)
+        cameraFollow(player.id, player.id)
 
         if not player.isSpawned or player.state == PlayerStates.DEAD then
             if Settings.SPAWN_WEAPONS then
