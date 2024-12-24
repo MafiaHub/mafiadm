@@ -78,6 +78,7 @@ local settings = {
         AFK_DROP_BOMB = 15.0,
         PICKUP_BOMB = 5.0,
         PICKUP_FLAG = 5.0,
+        INTERACT_FLAG = 2.5,
         BUYING = 30.0,
         BUY_PICKUP_WEAPON = 3.0,
         END_ROUND = 10.0,
@@ -90,13 +91,13 @@ local settings = {
         }
     },
     SPAWN_WEAPONS = {
-        6, -- Colt Detective Special
+        9, -- Colt 1911
     },
     MIN_PLAYER_AMOUNT_PER_TEAM = 1,
     PLAYER_DISABLE_ECONOMY = false,
     PLAYER_DISABLE_SHOP = false,
     PLAYER_STARTING_MONEY = 5000,
-    PLAYER_MAX_MONEY = 160000,
+    PLAYER_MAX_MONEY = 16000,
     PLAYER_RESPAWN_AFTER_DEATH = false,
     PLAYER_USE_SPAWNPOINTS = false,
     PLAYER_HOTJOIN = false,
